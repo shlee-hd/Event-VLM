@@ -117,11 +117,32 @@ class BaseDetector(ABC):
 
 
 class DETRDetector(BaseDetector):
-    """DETR-L detector wrapper using Ultralytics."""
+    """
+    RT-DETR detector wrapper using Ultralytics.
+    
+    Supports multiple variants:
+    - detr-r18: ResNet-18 backbone (~20M params, comparable to YOLO-S)
+    - detr-r50: ResNet-50 backbone (~42M params)
+    - detr-l: Large model with HGNetV2 backbone (~32M params)
+    - detr-x: Extra-large model (~67M params)
+    
+    For lightweight deployment, use detr-r18 which provides:
+    - Similar FLOPs to YOLOv8-S
+    - Better accuracy than YOLO-Nano on COCO
+    - End-to-end transformer architecture (no NMS)
+    """
+    
+    # Model variants with weight files and approximate parameters
+    MODEL_VARIANTS = {
+        "detr-r18": "rtdetr-r18.pt",    # ~20M params, lightweight
+        "detr-r50": "rtdetr-r50.pt",    # ~42M params, balanced
+        "detr-l": "rtdetr-l.pt",        # ~32M params, HGNetV2 backbone
+        "detr-x": "rtdetr-x.pt",        # ~67M params, largest
+    }
     
     def __init__(
         self,
-        model_name: str = "detr-l",
+        model_name: str = "detr-r18",  # Default to lightweight
         pretrained: bool = True,
         **kwargs
     ):
@@ -132,23 +153,37 @@ class DETRDetector(BaseDetector):
         self.load_model()
     
     def load_model(self) -> None:
-        """Load DETR-L from Ultralytics."""
+        """Load RT-DETR from Ultralytics."""
         try:
             from ultralytics import RTDETR
             
-            if self.model_name == "detr-l":
-                self.model = RTDETR("rtdetr-l.pt")
-            elif self.model_name == "detr-x":
-                self.model = RTDETR("rtdetr-x.pt")
-            else:
-                raise ValueError(f"Unknown DETR model: {self.model_name}")
+            if self.model_name not in self.MODEL_VARIANTS:
+                raise ValueError(
+                    f"Unknown DETR model: {self.model_name}. "
+                    f"Available: {list(self.MODEL_VARIANTS.keys())}"
+                )
             
+            weight_file = self.MODEL_VARIANTS[self.model_name]
+            self.model = RTDETR(weight_file)
             self.model.to(self.device)
-            logger.info(f"Loaded {self.model_name} on {self.device}")
+            logger.info(f"Loaded {self.model_name} ({weight_file}) on {self.device}")
             
         except ImportError:
             logger.error("ultralytics not installed. Run: pip install ultralytics")
             raise
+        except Exception as e:
+            # Fallback for models not yet released by Ultralytics
+            if "r18" in self.model_name or "r50" in self.model_name:
+                logger.warning(
+                    f"{self.model_name} weights not available in Ultralytics. "
+                    "Falling back to detr-l. For R18/R50, train from scratch or "
+                    "use weights from: https://github.com/lyuwenyu/RT-DETR"
+                )
+                from ultralytics import RTDETR
+                self.model = RTDETR("rtdetr-l.pt")
+                self.model.to(self.device)
+            else:
+                raise
     
     def detect(self, image: np.ndarray) -> DetectionResult:
         """Run DETR detection on image."""
