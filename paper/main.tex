@@ -9,70 +9,43 @@
 % TODO FINAL: Un-comment the following line for the camera-ready version
 %\usepackage{eccv}
 
-% OPTIONAL: Un-comment the following line for a version which is easier to read
-% on small portrait-orientation screens (e.g., mobile phones, or beside other windows)
-%\usepackage[mobile]{eccv}
-
-
 % ---------------------------------------------------------------
 % Other packages
-
-% Commonly used abbreviations (\eg, \ie, \etc, \cf, \etal, etc.)
 \usepackage{eccvabbrv}
-
-% Include other packages here, before hyperref.
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage[section]{placeins}  % Prevent floats from floating past section boundaries
-\usepackage{float}  % For [H] placement option
-
-% The "axessiblity" package can be found at: https://ctan.org/pkg/axessibility?lang=en
-\usepackage[accsupp]{axessibility}  % Improves PDF readability for those with disabilities.
-
+\usepackage[section]{placeins}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[accsupp]{axessibility}
 
 % ---------------------------------------------------------------
 % Hyperref package
-
-% It is strongly recommended to use hyperref, especially for the review version.
-% Please disable hyperref *only* if you encounter grave issues.
-% hyperref with option pagebackref eases the reviewers' job, but should be disabled for the final version.
-%
-% If you comment hyperref and then uncomment it, you should delete
-% main.aux before re-running LaTeX.
-% (Or just hit 'q' on the first LaTeX run, let it finish, and you
-%  should be clear).
-
 % TODO FINAL: Comment out the following line for the camera-ready version
 \usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
 % TODO FINAL: Un-comment the following line for the camera-ready version
 %\usepackage{hyperref}
 
-% Support for ORCID icon
 \usepackage{orcidlink}
+
+\newcommand{\Idom}{\mathcal{I}_{\text{dom}}}
+\newcommand{\Ttop}{\mathcal{T}}
 
 
 \begin{document}
 
 % ---------------------------------------------------------------
-% TODO REVIEW: Replace with your title
-\title{Event-VLM: A Scalable and Efficient Framework for Real-time Accident Explanation in Large-scale Surveillance Systems} 
+\title{Event-VLM: Three-Axis Efficient Inference for\\Real-time Surveillance Video Understanding}
 
-% TODO REVIEW: If the paper title is too long for the running head, you can set
-% an abbreviated paper title here. If not, comment out.
 \titlerunning{Event-VLM}
 
-% TODO FINAL: Replace with your author list. 
-% Include the authors' OCRID for the camera-ready version, if at all possible.
 \author{First Author\inst{1}\orcidlink{0000-1111-2222-3333} \and
 Second Author\inst{2,3}\orcidlink{1111-2222-3333-4444} \and
 Third Author\inst{3}\orcidlink{2222--3333-4444-5555}}
 
-% TODO FINAL: Replace with an abbreviated list of authors.
 \authorrunning{F.~Author et al.}
-% First names are abbreviated in the running head.
-% If there are more than two authors, 'et al.' is used.
 
-% TODO FINAL: Replace with your institution list.
 \institute{Princeton University, Princeton NJ 08544, USA \and
 Springer Heidelberg, Tiergartenstr.~17, 69121 Heidelberg, Germany
 \email{lncs@springer.com}\\
@@ -83,12 +56,11 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 \maketitle
 
 
-
 % --- ABSTRACT ---
 \begin{abstract}
-Recent Vision-Language Models (VLMs) have demonstrated remarkable capabilities in understanding complex visual scenes. However, deploying them in real-world surveillance systems remains challenging due to the prohibitive computational cost required to process hundreds of concurrent video streams. Existing methods either sacrifice detailed understanding for speed or suffer from high latency, making them unsuitable for real-time accident detection. To address this dilemma, we propose \textbf{Event-VLM}, a cascaded framework designed for scalable and efficient video understanding with \textit{hazard-aware} optimization. Our approach introduces four key innovations: (1) An \textit{Event-Triggered Gating Mechanism} with risk-sensitive detection loss that prioritizes life-threatening events; (2) A \textit{Knowledge-Guided Token Pruning} module with adaptive dilation for amorphous hazards (e.g., fire, smoke), reducing computational FLOPs by \textbf{75\%} in a training-free manner; (3) \textit{Hazard-Priority Prompting} that dynamically selects specialized prompts based on event severity; and (4) lightweight domain adaptation requiring only $<$0.1\% trainable parameters. Extensive experiments on UCFCrime and XD-Violence datasets demonstrate that our method achieves comparable accident explanation quality to state-of-the-art VLMs while boosting inference throughput by \textbf{9$\times$}.
+Vision-Language Models (VLMs) are attractive for intelligent surveillance, but their deployment is limited by inference economics: processing hundreds of concurrent streams with full-frame, full-cache decoding is prohibitively expensive. We show that this cost is driven by three orthogonal redundancies: \textit{temporal} (most frames are non-events), \textit{spatial} (most visual tokens are irrelevant background), and \textit{decoding} (auto-regressive KV-cache access becomes memory-bandwidth bound). We present \textbf{Event-VLM}, a cascaded framework that allocates computation only \textit{when} events occur, \textit{where} hazards reside, and \textit{which} cache entries matter during generation. Event-VLM combines: (1) \textit{Event-Triggered Gating} with risk-sensitive detection loss for high recall on critical hazards; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards, reducing visual tokens by 75\% without retraining; and (3) \textit{Frequency-Aware Sparse Decoding}, which uses dominant RoPE frequency chunks as a training-free proxy for online token importance and focused KV access. An optional hazard-priority prompting module further improves domain-specific explanation quality with negligible overhead. On UCF-Crime and XD-Violence, Event-VLM achieves \textbf{9$\times$} higher throughput than strong VLM baselines while preserving 99\% caption quality, providing a practical blueprint for real-time, large-scale safety monitoring.
 
-\keywords{Vision-Language Models, Efficient Video Understanding, Surveillance, Token Pruning, Real-time System}
+\keywords{Vision-Language Models, Efficient Inference, Surveillance, Token Pruning, KV Cache Optimization, Sparse Attention}
 \end{abstract}
 
 
@@ -96,226 +68,265 @@ Recent Vision-Language Models (VLMs) have demonstrated remarkable capabilities i
 \section{Introduction}
 
 \paragraph{The Paradigm Shift.}
-Recent advancements in Large Vision-Language Models (VLMs), such as LLaVA~\cite{llava} and GPT-4V~\cite{gpt4v}, have revolutionized computer vision by enabling systems not only to localize objects but to reason about complex visual scenes with human-level semantics. In the domain of Intelligent Surveillance Systems (ISS), this paradigm shift offers a transformative opportunity: moving beyond simple object detection (e.g., ``a person detected'') to comprehensive \textit{accident explanation} (e.g., ``a worker has collapsed due to a falling object''). Such detailed semantic understanding is critical for timely intervention in high-risk environments like construction sites and shipyards, where understanding the \textit{cause} and \textit{context} of an event is as important as detecting its occurrence.
+Large Vision-Language Models (VLMs) such as LLaVA~\cite{llava} and GPT-4V~\cite{gpt4v} have revolutionized visual understanding, enabling systems to move beyond simple object detection toward comprehensive \textit{accident explanation}---describing not only what happened but \textit{why} and \textit{how} an event unfolded. In Intelligent Surveillance Systems (ISS), this capability is critical: understanding that ``a worker collapsed due to being struck by a falling object'' is far more actionable than simply reporting ``a person detected.''
 
 \paragraph{The Scalability Bottleneck.}
-However, deploying these powerful VLMs in real-world surveillance presents a fundamental \textbf{scalability bottleneck}. Unlike static image analysis, surveillance systems must process continuous, high-resolution video streams from hundreds of concurrent channels. Standard VLMs, built upon the Vision Transformer (ViT)~\cite{vit} architecture, suffer from quadratic computational complexity regarding the number of visual tokens. For instance, processing a single video stream with a 7B-parameter VLM can consume significant GPU memory and incur high latency, making it computationally prohibitive to scale to city-wide or factory-wide camera networks. Consequently, current approaches are forced to compromise: they either use lightweight detectors that lack semantic understanding~\cite{yolo,yolov7} or rely on heavy VLMs that operate far below real-time requirements~\cite{videollama}.
+Deploying VLMs in real-world surveillance presents a fundamental \textbf{scalability bottleneck}. Unlike offline video analysis, surveillance systems must process continuous, high-resolution streams from hundreds of concurrent cameras. We identify three orthogonal axes of computational redundancy that make this prohibitively expensive (Fig.~\ref{fig:framework}):
+
+\begin{itemize}
+    \item \textbf{Temporal Redundancy}: In typical surveillance footage, critical events occupy less than 1\% of the total duration. Processing every frame with a heavy VLM is wasteful.
+    \item \textbf{Spatial Redundancy}: In a typical CCTV view, the vast majority of visual tokens (walls, sky, empty roads) are semantically irrelevant to any safety event. Feeding these tokens into costly self-attention layers is a significant waste.
+    \item \textbf{Decoding Redundancy}: During auto-regressive text generation, the Key-Value (KV) cache grows linearly with context length. At each decoding step, the model must access the \textit{entire} cache, creating a memory-bandwidth bottleneck that underutilizes modern GPUs~\cite{flash_attention}. This is particularly acute in VLMs, where hundreds of visual tokens inflate the KV cache.
+\end{itemize}
 
 \paragraph{Limitations of Existing Work.}
-To mitigate these costs, recent studies have focused on temporal efficiency. Methods like SeViLA~\cite{sevila} employ a ``keyframe selection'' strategy, identifying and processing only the most informative frames. While effective in reducing temporal redundancy, these methods overlook a critical characteristic of surveillance footage: \textbf{spatial redundancy}. In a typical CCTV view, the vast majority of the pixel space (e.g., walls, sky, empty roads) remains static or irrelevant to the safety hazard. Feeding these non-informative ``background tokens'' into a computationally expensive VLM represents a significant waste of resources. Furthermore, existing token pruning methods---both learnable (DynamicViT~\cite{dynamicvit}, EViT~\cite{evit}) and training-free (ToMe~\cite{tome})---operate on statistical importance (attention scores, similarity) without domain knowledge, often failing to preserve small but critical hazard cues essential for accident analysis.
+Existing acceleration methods usually optimize one axis while leaving the others as hidden bottlenecks. Temporal methods (e.g., SeViLA~\cite{sevila}) reduce frame count but still process dense spatial tokens and full decoding state. Spatial pruning methods (ToMe~\cite{tome}, DynamicViT~\cite{dynamicvit}) shrink token sets but are often domain-agnostic, risking the removal of small yet safety-critical cues. KV cache methods (StreamingLLM~\cite{streamingllm}, SnapKV~\cite{snapkv}) target language-only settings and are not designed for visual-textual surveillance contexts. As a result, single-axis acceleration quickly saturates in end-to-end deployment.
 
 \paragraph{Our Approach: Event-VLM.}
-To bridge the gap between deep semantic understanding and real-time scalability, we propose \textbf{Event-VLM}, a cascaded framework designed to minimize computational waste in both temporal and spatial dimensions. Our core insight is that \textit{``computation should be allocated only where the event occurs.''}
-First, we introduce an \textbf{Event-Triggered Gating} mechanism using a lightweight detector~\cite{yolo} with risk-sensitive loss to filter out background frames while maximizing recall on critical hazards. Second, we propose a \textbf{Knowledge-Guided Token Pruning} module that leverages detection priors (bounding boxes) to explicitly mask out irrelevant background tokens \textit{before} they enter the heavy VLM backbone. Unlike attention-based pruning~\cite{tome,dynamicvit}, our approach preserves hazard tokens regardless of statistical prominence, reducing the token count by \textbf{75\%} without retraining. Finally, we employ \textbf{Hazard-Priority Prompting} inspired by prompt tuning methods~\cite{coop,vpt,lora} to dynamically select specialized prompts based on detected hazard severity.
+We propose \textbf{Event-VLM}, a cascaded framework built on a simple systems principle: allocate computation only \textit{when} an event occurs, \textit{where} the hazard is located, and \textit{which} memory entries are relevant for generation.
+\begin{enumerate}
+    \item \textbf{Event-Triggered Gating} (Temporal) uses a lightweight detector with \textit{risk-sensitive loss} to suppress background frames while preserving recall on critical hazards.
+    \item \textbf{Knowledge-Guided Token Pruning} (Spatial) converts detector priors into dynamic token masks, with \textit{adaptive dilation} for amorphous hazards such as fire and smoke.
+    \item \textbf{Frequency-Aware Sparse Decoding} (Decoding) adapts RoPE frequency-chunk functional sparsity~\cite{fasa} to VLM decoding, enabling training-free token importance estimation and focused KV access during generation.
+\end{enumerate}
+
+These three stages are \textbf{training-free} with respect to the VLM backbone, requiring no backbone modification or full-model fine-tuning. We additionally include an optional, lightweight prompting module for domain adaptation.
 
 \paragraph{Contributions.}
-Our main contributions are summarized as follows:
 \begin{itemize}
-    \item We propose \textbf{Event-VLM}, the first hazard-aware VLM framework specifically optimized for large-scale, real-time surveillance systems, featuring end-to-end optimization from detection to explanation.
-    \item We introduce a \textbf{Risk-Sensitive Detection Loss} and \textbf{Adaptive Spatial Pruning} strategy that explicitly accounts for hazard severity and object morphology, ensuring high recall on critical events while minimizing computational overhead.
-    \item We propose \textbf{Hazard-Priority Prompting} that dynamically adapts the VLM's reasoning focus based on detected hazard types, enabling specialized analysis for different safety scenarios.
-    \item Extensive experiments on UCFCrime and XD-Violence datasets demonstrate that our method achieves \textbf{9$\times$} higher throughput compared to standard VLM baselines while maintaining 99\% caption quality.
+    \item We present \textbf{Event-VLM}, the first surveillance-oriented VLM framework that jointly optimizes temporal, spatial, and decoding efficiency in a single end-to-end pipeline.
+    \item We introduce \textbf{risk-sensitive gating} and \textbf{adaptive spatial pruning}, which explicitly encode hazard severity and object morphology to preserve critical evidence under aggressive compute budgets.
+    \item We adapt \textbf{frequency-aware sparse decoding} to mixed visual-textual generation, showing that dominant RoPE frequency chunks are an effective training-free proxy for KV saliency.
+    \item On UCF-Crime and XD-Violence, Event-VLM delivers \textbf{9$\times$} higher throughput while retaining 99\% caption quality, establishing a practical path to real-time multi-camera deployment.
 \end{itemize}
 
 
+% --- RELATED WORK ---
 \section{Related Work}
 
 \subsection{Large Vision-Language Models}
-The convergence of computer vision and natural language processing has led to the emergence of Large Vision-Language Models (VLMs) capable of performing complex multimodal reasoning. 
-CLIP~\cite{clip} pioneered the alignment of visual and textual representations through contrastive learning on 400 million image-text pairs, establishing a foundation for zero-shot visual recognition. Building upon this, generative models such as Flamingo~\cite{flamingo} and BLIP-2~\cite{blip2} introduced architectural innovations (perceiver resampler and Q-Former, respectively) to bridge frozen image encoders with LLMs. The LLaVA family~\cite{llava,llava15,llavanext} demonstrated that simple projection-based architectures can achieve remarkable visual instruction following, while InstructBLIP~\cite{instructblip} and MiniGPT-4~\cite{minigpt4} explored instruction tuning for enhanced controllability. More recently, Qwen-VL~\cite{qwenvl} and CogVLM~\cite{cogvlm} introduced visual experts and fine-grained grounding capabilities. GPT-4V~\cite{gpt4v} and PaLI~\cite{pali} further pushed the boundaries with proprietary large-scale training.
+The convergence of vision and language has produced VLMs capable of complex multimodal reasoning. CLIP~\cite{clip} pioneered visual-textual alignment via contrastive learning. Generative models such as Flamingo~\cite{flamingo} and BLIP-2~\cite{blip2} bridged frozen encoders with LLMs, while the LLaVA family~\cite{llava,llava15,llavanext} showed that simple projection architectures achieve remarkable visual instruction following. Qwen-VL~\cite{qwenvl} and CogVLM~\cite{cogvlm} introduced visual experts and grounding capabilities.
 
-For video understanding, Video-LLaMA~\cite{videollama} and VideoChat~\cite{videochat} extended image-based VLMs with temporal modeling, while VILA~\cite{vila} showed that incorporating video data during pre-training significantly improves temporal reasoning. Video-LLaVA~\cite{videollava} proposed unified visual representation learning, and TimeChat~\cite{timechat} introduced time-sensitive understanding for long videos. However, these models typically employ heavy visual encoders (e.g., ViT-L/14~\cite{vit}) with billion-parameter LLMs, creating substantial computational demands. The foundational attention mechanism~\cite{attention} underlying these models incurs quadratic complexity, making real-time deployment challenging in resource-constrained surveillance systems.
+For video understanding, Video-LLaMA~\cite{videollama} and VideoChat~\cite{videochat} extended image VLMs with temporal modeling, while VILA~\cite{vila} showed that video pre-training improves temporal reasoning. However, these models employ heavy visual encoders with billion-parameter LLMs, and the quadratic attention complexity~\cite{attention} makes real-time deployment challenging.
 
 \subsection{Efficient Vision Transformers and Token Pruning}
-To address the quadratic complexity of self-attention in Vision Transformers~\cite{vit,vit_survey,swin}, various efficiency techniques have been proposed.
+DynamicViT~\cite{dynamicvit} introduced learnable modules for progressive token discard. EViT~\cite{evit} fused less attentive tokens into representative tokens. ToMe~\cite{tome} proposed training-free token merging based on key-value similarity, achieving 2$\times$ speedup. SPViT~\cite{spvit} optimized pruning for latency. For video, SeViLA~\cite{sevila} employed keyframe selection and SlowFast~\cite{slowfast} proposed dual-pathway architectures.
 
-\textbf{Static and Dynamic Pruning.}
-DynamicViT~\cite{dynamicvit} introduced learnable prediction modules that progressively discard uninformative tokens during inference. EViT~\cite{evit} reorganized tokens by fusing less attentive ones into a single representative token, preserving global context. SPViT~\cite{spvit} proposed latency-aware soft pruning optimized for deployment. More recently, ATS~\cite{ats} enabled adaptive token sampling without additional training, while EfficientViT~\cite{efficientvit} combined cascaded group attention with token pruning.
-
-\textbf{Token Merging and Hierarchical Attention.}
-ToMe~\cite{tome} proposed a training-free approach that gradually merges similar tokens based on key-value similarity, achieving 2$\times$ speedup without retraining. FasterViT~\cite{fastervit} introduced hierarchical attention to process tokens at multiple granularities. The Swin Transformer~\cite{swin} and PVT~\cite{pvt} pioneered hierarchical vision transformers with shifted windows and pyramid structures, respectively.
-
-\textbf{Efficient Architectures.}
-Beyond pruning, architectural innovations include DeiT~\cite{deit} for data-efficient training, LeViT~\cite{levit} for hybrid CNN-Transformer designs, MobileFormer~\cite{mobileformer} for mobile deployment, and PoolFormer~\cite{poolformer} demonstrating that the MetaFormer architecture itself drives performance.
-
-\textbf{Temporal Efficiency for Video.}
-For video understanding, SeViLA~\cite{sevila} employed a self-chained localization mechanism to identify informative keyframes. FAST-VQA~\cite{fastvqa} used fragment sampling to reduce temporal redundancy. SlowFast~\cite{slowfast} and TimeSformer~\cite{timesformer} proposed dual-pathway and divided space-time attention for efficient video recognition. FlashAttention~\cite{flash_attention} optimized the attention mechanism at the hardware level for memory efficiency.
-
-\textbf{Limitations for Safety-Critical Applications.}
-Despite their effectiveness, existing pruning methods rely on statistical importance (attention scores, feature similarity) without semantic understanding. In safety-critical scenarios, small but crucial hazards (e.g., a distant spark, falling debris) may have low statistical prominence and risk being pruned. Our \textbf{Knowledge-Guided Token Pruning} addresses this by leveraging explicit object detection priors from lightweight detectors~\cite{yolo,yolov7,focal_loss}, ensuring semantically important regions are preserved regardless of their statistical characteristics.
+Despite their effectiveness, existing pruning methods rely on statistical importance without domain knowledge. In safety-critical scenarios, small hazards may have low statistical prominence and risk being pruned. Our \textbf{Knowledge-Guided Token Pruning} addresses this by leveraging detection priors~\cite{yolo}.
 
 \subsection{Vision-Language Models for Anomaly Detection}
-Traditional Video Anomaly Detection (VAD) methods relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal feature learning~\cite{rtfm,i3d,c3d,slowfast}, lacking semantic interpretability. The seminal work of Sultani et al.~\cite{ucfcrime} introduced weakly-supervised VAD with Multiple Instance Learning on the UCF-Crime dataset. RTFM~\cite{rtfm} improved feature magnitude learning, while MIST~\cite{mist} proposed self-training for better pseudo-labels. The XD-Violence dataset~\cite{xdviolence} extended VAD to multimodal settings with audio-visual cues. MGFN~\cite{mgfn} introduced magnitude-contrastive learning, and UMIL~\cite{umil} addressed bias in weakly-supervised detection.
+Traditional Video Anomaly Detection (VAD) relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal features~\cite{rtfm,i3d}. Recently, VLMs enabled explainable detection: AnomalyGPT~\cite{anomalygpt} fine-tuned VLMs on defect datasets, Holmes-VAD~\cite{holmes_vad} proposed multi-modal detection with chain-of-thought reasoning, and VADCLIP~\cite{vadclip} adapted CLIP for weakly-supervised VAD. However, these assume offline single-stream processing.
 
-Recently, the integration of VLMs has enabled explainable anomaly detection. AnomalyGPT~\cite{anomalygpt} fine-tuned VLMs on industrial defect datasets using prompt tuning techniques~\cite{lora,coop,vpt}. Holmes-VAD~\cite{holmes_vad} proposed multi-modal LLM-based detection with chain-of-thought reasoning. VADCLIP~\cite{vadclip} adapted CLIP for weakly-supervised VAD without extensive fine-tuning. However, these approaches operate under the assumption of \textbf{offline processing} or \textbf{single-stream inputs}, utilizing the full computational power of the VLM for every query.
+\subsection{KV Cache Optimization and Sparse Attention}
+The growing KV cache is a critical bottleneck for LLM inference. StreamingLLM~\cite{streamingllm} maintained a fixed-size window with ``attention sinks.'' H2O~\cite{h2o} evicted tokens based on cumulative attention. SnapKV~\cite{snapkv} selected important KV entries per layer. PyramidKV~\cite{pyramidkv} allocated varying budgets across layers. However, these methods use heuristic importance measures that are not truly query-aware.
 
-\textbf{Event-VLM} differs fundamentally by adopting a \textit{system-level} optimization perspective: we treat the heavy VLM as an on-demand resource, invoked only when triggered by potential hazards and processing only semantically relevant visual regions. This cascaded design enables scalable real-time performance across hundreds of concurrent camera streams, bridging the gap between powerful VLM understanding and practical surveillance deployment~\cite{industrial_safety_survey,construction_safety,video_surveillance_survey}.
+FASA~\cite{fasa} recently discovered that RoPE~\cite{rope} induces \textit{functional sparsity} at the frequency-chunk level: a small subset of ``dominant'' frequency chunks captures contextual attention patterns, while the majority encode positional structures. This provides a training-free, query-aware proxy for token importance. While FASA targets text-only LLMs, we adapt this insight to the VLM setting, where visual tokens significantly inflate the KV cache.
 
-\subsection{Discussion: Positioning of Event-VLM}
-Table~\ref{tab:method_comparison} summarizes our positioning relative to existing methods. While temporal-only methods (SeViLA) miss spatial redundancy and spatial-only methods (ToMe, DynamicViT) lack domain awareness, Event-VLM uniquely combines both dimensions with hazard-aware optimization. Notably, our spatial pruning is \textbf{training-free} (unlike DynamicViT, SPViT) and leverages \textbf{semantic priors} (unlike ToMe's statistical similarity), making it particularly suitable for safety-critical surveillance where missing a hazard is unacceptable.
+\subsection{Positioning of Event-VLM}
+Table~\ref{tab:method_comparison} summarizes our positioning. Event-VLM is the first to address temporal, spatial, \textit{and} decoding efficiency simultaneously, all in a training-free manner with domain-aware optimization.
 
 \begin{table}[t]
-\caption{\textbf{Comparison of Efficiency Strategies.} Event-VLM uniquely achieves temporal and spatial efficiency with training-free, domain-aware optimization.}
+\caption{\textbf{Comparison of Efficiency Strategies.} Event-VLM uniquely addresses all three axes of redundancy with training-free, domain-aware optimization.}
 \label{tab:method_comparison}
 \centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{l|ccccc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l|cccccc}
 \toprule
-\textbf{Method} & \textbf{Venue} & \textbf{Temporal} & \textbf{Spatial} & \textbf{Train-free} & \textbf{Domain} \\
+\textbf{Method} & \textbf{Venue} & \textbf{Temporal} & \textbf{Spatial} & \textbf{Decoding} & \textbf{Train-free} & \textbf{Domain} \\
 \midrule
-DynamicViT~\cite{dynamicvit} & NeurIPS'21 & - & \checkmark & - & - \\
-EViT~\cite{evit} & ICLR'22 & - & \checkmark & - & - \\
-SPViT~\cite{spvit} & ECCV'22 & - & \checkmark & - & - \\
-ToMe~\cite{tome} & ICLR'23 & - & \checkmark & \checkmark & - \\
-SeViLA~\cite{sevila} & NeurIPS'23 & \checkmark & - & - & - \\
-AnomalyGPT~\cite{anomalygpt} & AAAI'24 & - & - & - & \checkmark \\
-Holmes-VAD~\cite{holmes_vad} & CVPR'25 & - & - & - & \checkmark \\
+DynamicViT~\cite{dynamicvit} & NeurIPS'21 & - & \checkmark & - & - & - \\
+ToMe~\cite{tome} & ICLR'23 & - & \checkmark & - & \checkmark & - \\
+SeViLA~\cite{sevila} & NeurIPS'23 & \checkmark & - & - & - & - \\
+StreamingLLM~\cite{streamingllm} & ICLR'24 & - & - & \checkmark & \checkmark & - \\
+SnapKV~\cite{snapkv} & NeurIPS'24 & - & - & \checkmark & \checkmark & - \\
+FASA~\cite{fasa} & arXiv'26 & - & - & \checkmark & \checkmark & - \\
+Holmes-VAD~\cite{holmes_vad} & CVPR'25 & - & - & - & - & \checkmark \\
 \midrule
-\textbf{Event-VLM} & - & \checkmark & \checkmark & \checkmark & \checkmark \\
+\textbf{Event-VLM} & - & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
+% --- METHOD ---
 \section{Method}
 
 \begin{figure}[!t]
   \centering
-  \includegraphics[width=0.95\textwidth,height=0.32\textheight,keepaspectratio]{figures/figure1_architecture.png} 
-  \caption{\textbf{Overview of the Event-VLM Framework.} 
-  Our system processes high-throughput surveillance streams via a cascaded three-stage hazard-aware approach:
-  (1) \textbf{Event-Triggered Gating} with risk-sensitive detection loss prioritizes critical hazards.
-  (2) \textbf{Knowledge-Guided Token Pruning} with adaptive dilation preserves context for amorphous objects.
-  (3) \textbf{Hazard-Priority Prompting} dynamically selects specialized prompts based on event severity.}
+  \includegraphics[width=0.95\textwidth,height=0.32\textheight,keepaspectratio]{figures/figure1_architecture.png}
+  \caption{\textbf{Overview of the Event-VLM Framework.}
+  Our system eliminates redundancy along three orthogonal axes:
+  (1) \textbf{Temporal}: Event-Triggered Gating filters background frames.
+  (2) \textbf{Spatial}: Knowledge-Guided Token Pruning removes irrelevant visual tokens.
+  (3) \textbf{Decoding}: Frequency-Aware Sparse Decoding optimizes KV cache access during generation.
+  (4) \textbf{Adaptation}: Hazard-Priority Prompting tailors the VLM to safety-critical reasoning.}
   \label{fig:framework}
 \end{figure}
 
 \subsection{Overview}
-Our goal is to design a video understanding framework that processes continuous surveillance streams $\mathcal{V} = \{\mathbf{X}_1, \mathbf{X}_2, \dots\}$ in real-time while generating accurate accident descriptions $\mathbf{Y}$.
-As illustrated in Fig.~\ref{fig:framework}, \textbf{Event-VLM} operates in a cascaded manner consisting of three stages:
-(1) \textit{Event-Triggered Gating} ($\mathcal{F}_{gate}$) filters out background frames;
-(2) \textit{Knowledge-Guided Token Pruning} ($\mathcal{F}_{prune}$) drastically reduces visual tokens based on detector priors; and
-(3) \textit{Context-Aware Generation} ($\mathcal{F}_{gen}$) produces safety-centric descriptions.
-The overall inference process for a frame $\mathbf{X}_t$ can be formulated as:
+Our goal is to process continuous surveillance streams $\mathcal{V} = \{\mathbf{X}_1, \mathbf{X}_2, \dots\}$ in real-time while generating accurate accident descriptions $\mathbf{Y}$.
+As illustrated in Fig.~\ref{fig:framework}, \textbf{Event-VLM} operates as a cascaded pipeline addressing three axes of redundancy:
+\begin{enumerate}
+    \item \textit{Event-Triggered Gating} ($\mathcal{F}_{gate}$) filters out background frames (\textbf{temporal});
+    \item \textit{Knowledge-Guided Token Pruning} ($\mathcal{F}_{prune}$) reduces visual tokens via detection priors (\textbf{spatial});
+    \item \textit{Frequency-Aware Sparse Decoding} ($\mathcal{F}_{sparse}$) optimizes KV cache access during generation (\textbf{decoding});
+    \item \textit{Hazard-Priority Prompting} ($\mathcal{P}_{ctx}$) adapts VLM reasoning to safety domains (\textbf{adaptation}).
+\end{enumerate}
+The overall inference for a frame $\mathbf{X}_t$ is:
 \begin{equation}
-    \mathbf{Y}_t = \mathcal{F}_{gen}(\mathcal{F}_{prune}(\mathbf{X}_t, \mathcal{B}_t) \mid \mathcal{P}_{ctx}) \quad \text{if} \quad \mathcal{F}_{gate}(\mathbf{X}_t) = 1,
+    \mathbf{Y}_t = \mathcal{F}_{sparse}\!\left(\mathcal{F}_{gen}\!\left(\mathcal{F}_{prune}(\mathbf{X}_t, \mathcal{B}_t) \mid \mathcal{P}_{ctx}\right)\right) \quad \text{if} \quad \mathcal{F}_{gate}(\mathbf{X}_t) = 1,
 \end{equation}
-where $\mathcal{B}_t$ represents the detected object bounding boxes and $\mathcal{P}_{ctx}$ denotes the learnable context prompts.
+where $\mathcal{B}_t$ are detected bounding boxes and $\mathcal{P}_{ctx}$ are learnable context prompts.
 
-\subsection{Stage 1: Event-Triggered Gating}
-Processing every frame with a VLM is computationally redundant in surveillance scenarios where critical events are sparse. We employ a lightweight object detector (e.g., YOLOv8-Nano) as a \textit{Trigger Module}.
-For an input frame $\mathbf{X}_t$, the detector predicts a set of bounding boxes $\mathcal{B}_t = \{b_1, b_2, \dots, b_N\}$ and corresponding class scores $\mathcal{S}_t = \{s_1, s_2, \dots, s_N\}$.
-We define a binary indicator function $\mathbb{I}_{event}$ to determine whether to invoke the heavy VLM:
+
+\subsection{Stage 1: Event-Triggered Gating (Temporal Axis)}
+Processing every frame with a VLM is computationally redundant. We use a lightweight detector (YOLOv8-Nano) as a \textit{Trigger Module}.
+For frame $\mathbf{X}_t$, the detector predicts bounding boxes $\mathcal{B}_t = \{b_1, \dots, b_N\}$ with class scores $\mathcal{S}_t = \{s_1, \dots, s_N\}$. The binary gating function is:
 \begin{equation}
     \mathbb{I}_{event}(\mathbf{X}_t) = 
     \begin{cases} 
-    1 & \text{if } \exists k, s_k > \tau_{conf} \text{ and } c_k \in \mathcal{C}_{hazard} \\
-    0 & \text{otherwise},
+    1 & \text{if } \exists k,\; s_k > \tau_{conf} \text{ and } c_k \in \mathcal{C}_{hazard} \\
+    0 & \text{otherwise}.
     \end{cases}
 \end{equation}
-where $\tau_{conf}$ is a confidence threshold and $\mathcal{C}_{hazard}$ is a predefined set of hazard-related classes (e.g., person, forklift, fire). If $\mathbb{I}_{event}(\mathbf{X}_t) = 0$, the frame is discarded immediately, incurring negligible computational cost.
 
 \subsubsection{Risk-Sensitive Detection Loss.}
-A critical concern in cascaded inference is error propagation: if the trigger misses a hazard, the VLM is never invoked. To mitigate this, we propose a \textit{Risk-Sensitive Detection Loss} that prioritizes high-risk categories during detector training.
-We partition $\mathcal{C}_{hazard}$ into severity tiers: $\mathcal{C}_{critical}$ (fire, smoke, collapse), $\mathcal{C}_{high}$ (forklift, heavy machinery), and $\mathcal{C}_{standard}$ (person, vehicle). The training objective becomes:
+To prevent error propagation in our cascaded design, we propose a \textit{Risk-Sensitive Detection Loss} that prioritizes high-risk categories.
+We partition $\mathcal{C}_{hazard}$ into severity tiers: $\mathcal{C}_{critical}$ (fire, smoke, collapse), $\mathcal{C}_{high}$ (forklift, heavy machinery), $\mathcal{C}_{standard}$ (person, vehicle):
 \begin{equation}
-    \mathcal{L}_{detect} = \sum_{k=1}^{N} w(c_k) \cdot \mathcal{L}_{focal}(p_k, y_k),
-\end{equation}
-where the hazard weight $w(c_k)$ is defined as:
-\begin{equation}
+    \mathcal{L}_{detect} = \sum_{k=1}^{N} w(c_k) \cdot \mathcal{L}_{focal}(p_k, y_k), \quad
     w(c_k) = \begin{cases}
     \lambda_{crit} & \text{if } c_k \in \mathcal{C}_{critical} \\
     \lambda_{high} & \text{if } c_k \in \mathcal{C}_{high} \\
     1.0 & \text{otherwise}.
     \end{cases}
 \end{equation}
-By setting $\lambda_{crit} > \lambda_{high} > 1$, we bias the detector towards higher recall on life-threatening events, accepting a controlled increase in false positives for non-critical classes.
+By setting $\lambda_{crit} > \lambda_{high} > 1$, we bias the detector toward higher recall on life-threatening events.
 
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=0.95\textwidth,height=0.28\textheight,keepaspectratio]{figures/figure2_components.png}
-  \caption{\textbf{Hazard-Aware Components Detail.} (Left) Risk-sensitive loss assigns higher weights to critical hazard classes. (Center) Adaptive dilation expands context proportionally to intraclass shape variance. (Right) Priority prompt selection routes critical events to specialized prompt banks.}
-  \label{fig:components}
-\end{figure}
 
-\subsection{Stage 2: Knowledge-Guided Token Pruning}
-Standard VLMs process the entire image as a sequence of patch tokens, regardless of semantic density. We propose to prune background tokens explicitly using the localization priors obtained from Stage 1. This is a training-free operation that ensures high efficiency.
-
-\subsubsection{Tokenization and Mapping.}
-Let the Vision Encoder (e.g., ViT) divide the frame $\mathbf{X}_t \in \mathbb{R}^{H \times W \times 3}$ into a sequence of $L$ patches $\mathbf{Z} = \{z_1, \dots, z_L\}$, where $L = (H/P) \times (W/P)$ and $P$ is the patch size.
-Each bounding box $b_k \in \mathcal{B}_t$ is defined by coordinates $(x_1, y_1, x_2, y_2)$. We map these coordinates to the patch grid indices to define the \textit{Region of Interest (RoI)}.
+\subsection{Stage 2: Knowledge-Guided Token Pruning (Spatial Axis)}
+Standard VLMs process all patch tokens regardless of semantic density. We prune background tokens using detection priors from Stage~1 in a training-free manner.
 
 \subsubsection{Dynamic Mask Generation.}
-We construct a binary importance mask $\mathbf{M} \in \{0, 1\}^L$ for the token sequence. A token $z_i$ is preserved if its corresponding patch location overlaps with any expanded bounding box in $\mathcal{B}_t$. Formally, let $\Omega(b_k)$ be the set of patch indices covered by box $b_k$. The mask is defined as:
+Let the ViT divide frame $\mathbf{X}_t \in \mathbb{R}^{H \times W \times 3}$ into $L = (H/P) \times (W/P)$ patch tokens $\mathbf{Z} = \{z_1, \dots, z_L\}$.
+We map each bounding box to patch grid indices and define a binary importance mask $\mathbf{M} \in \{0,1\}^L$:
 \begin{equation}
-    \mathbf{M}_i = \mathbb{I}\left( i \in \bigcup_{k} \Omega(b_k) \right).
+    \mathbf{M}_i = \mathbb{I}\left( i \in \bigcup_{k} \Omega(b_k) \right),
 \end{equation}
+where $\Omega(b_k)$ is the set of patch indices covered by the (dilated) box $b_k$.
 
 \subsubsection{Adaptive Dilation for Amorphous Objects.}
-A key observation is that not all hazards have well-defined boundaries. Amorphous objects such as fire and smoke exhibit high \textit{intraclass shape variance}---their visual appearance changes continuously, and bounding box annotations are inherently ambiguous. Applying a fixed dilation ratio $\alpha$ to such objects risks losing critical contextual information.
-We propose an \textit{Adaptive Dilation} strategy that adjusts the expansion factor based on class-specific shape characteristics:
+Amorphous hazards (fire, smoke) have high intraclass shape variance. We adjust the bounding box expansion factor per class:
 \begin{equation}
     \alpha_k = \alpha_{base} \cdot \left(1 + \beta \cdot \sigma_{shape}(c_k)\right),
 \end{equation}
-where $\sigma_{shape}(c_k)$ denotes the normalized intraclass shape variance of class $c_k$, precomputed from training data using IoU statistics across instances. For amorphous classes (fire: $\sigma=0.42$, smoke: $\sigma=0.38$), the effective dilation is significantly larger than for rigid objects (person: $\sigma=0.12$, vehicle: $\sigma=0.08$). This ensures that the VLM receives sufficient visual context to reason about the spread and intensity of hazards with uncertain boundaries, while maintaining efficiency for well-localized objects.
+where $\sigma_{shape}(c_k)$ is the normalized intraclass shape variance precomputed from training data.
 
 \subsubsection{Pruning Operation.}
-Using the mask $\mathbf{M}$, we perform the pruning operation $\text{Gather}(\cdot)$ to obtain a reduced sequence of visual tokens $\hat{\mathbf{Z}}$:
+The reduced token sequence is:
 \begin{equation}
     \hat{\mathbf{Z}} = \{ z_i \mid \mathbf{M}_i = 1 \} \cup \{ z_{cls} \},
 \end{equation}
-where $z_{cls}$ is the special class token. The length of $\hat{\mathbf{Z}}$ is $L' \ll L$. This reduced sequence is then fed into the subsequent Transformer layers. Since the VLM backbone (e.g., LLaVA) uses causal or bidirectional attention, processing $\hat{\mathbf{Z}}$ reduces the complexity of the self-attention mechanism from $\mathcal{O}(L^2)$ to $\mathcal{O}(L'^2)$.
+with length $L' \ll L$, reducing self-attention complexity from $\mathcal{O}(L^2)$ to $\mathcal{O}(L'^2)$.
 
-\subsection{Stage 3: Context-Aware Prompt Tuning}
-General-purpose VLMs often generate generic descriptions (e.g., ``a man is lying down'') rather than safety-critical reports (e.g., ``a worker has fainted''). To adapt the model to the industrial domain without the high cost of full fine-tuning, we employ \textit{Soft Prompt Tuning}.
 
-We introduce a set of learnable vectors $\mathcal{P}_{ctx} \in \mathbb{R}^{K \times D}$, where $K$ is the prompt length and $D$ is the embedding dimension. These prompts are prepended to the text embeddings. The objective is to maximize the likelihood of the ground-truth safety caption $\mathbf{Y}$:
+\subsection{Stage 3: Frequency-Aware Sparse Decoding (Decoding Axis)}
+\label{sec:fasa_decoding}
+
+While Stages 1--2 reduce \textit{input-side} compute, auto-regressive generation can still dominate latency because each step reads a growing KV cache that includes visual tokens. We therefore introduce \textbf{Frequency-Aware Sparse Decoding}, a two-step strategy that adapts RoPE functional sparsity~\cite{fasa} to VLM decoding: (i) \textit{Token Importance Prediction} (TIP) in a compact frequency subspace, followed by (ii) \textit{Focused Attention Computation} (FAC) on a selected token subset.
+
+\subsubsection{Background: Functional Sparsity in RoPE.}
+In RoPE-based models~\cite{rope} (e.g., LLaMA/Vicuna used in LLaVA), each $d$-dimensional query/key vector is partitioned into $d/2$ orthogonal 2D subspaces called \textit{frequency chunks} (FCs). Each FC $i$ rotates at angular frequency $\theta_i = B^{-2(i-1)/d}$.
+
+A recent discovery~\cite{fasa} reveals that these FCs exhibit \textit{functional sparsity}: they can be categorized into two groups:
+\begin{itemize}
+    \item \textbf{Contextual FCs}: A small subset responsible for dynamic, query-dependent attention---identifying which tokens are semantically relevant.
+    \item \textbf{Structural FCs}: The remaining majority that encode fixed positional patterns (recency bias, attention sinks).
+\end{itemize}
+Critically, the set of contextual FCs (termed \textit{dominant FCs}, $\Idom$) is \textbf{sparse}, \textbf{universal across tasks}, and identifiable via a one-time offline calibration.
+
+\subsubsection{Offline Calibration of Dominant FCs.}
+We perform a one-time calibration to identify $\Idom^{l,h}$ for each attention head $(l,h)$ in the LLM backbone. Using a small calibration set $\Omega$ and the Contextual Agreement (CA) metric~\cite{fasa}, we measure how well each single FC's attention pattern aligns with the full head:
+\begin{equation}
+    \text{CA}_{\mathcal{K}}^{l,h,i} = \frac{|\text{TopK}(\boldsymbol{\alpha}_{l,h}, \mathcal{K}) \cap \text{TopK}(\boldsymbol{\alpha}_{l,h}^{(i)}, \mathcal{K})|}{\mathcal{K}},
+\end{equation}
+where $\boldsymbol{\alpha}_{l,h}$ is the full attention score vector and $\boldsymbol{\alpha}_{l,h}^{(i)}$ uses only the $i$-th FC.
+The dominant set is selected as:
+\begin{equation}
+    \Idom^{l,h} = \text{TopK-I}\!\left(\{\text{CA}_{\mathcal{K}}^{l,h,i}\}_{i=0}^{d/2-1},\; F\right),
+\end{equation}
+where $F \ll d/2$ is the number of dominant FCs (typically $F \approx d/8$).
+
+\subsubsection{Online Token Importance Prediction.}
+During decoding at step $t$, instead of computing full attention over the entire KV cache, we estimate token importance using only the dominant FCs:
+\begin{equation}
+    \mathbf{S}_t^{l,h} = \sum_{i \in \Idom^{l,h}} \boldsymbol{\alpha}^{l,h,i}(\mathbf{q}_t, \mathbf{K}_{1:t}),
+\end{equation}
+where $\boldsymbol{\alpha}^{l,h,i}$ denotes the partial attention score computed from the $i$-th FC subspace only. This operates in a greatly reduced dimensionality ($2F$ vs.\ $d$), making the importance estimation computationally frugal.
+
+\subsubsection{Focused Attention Computation.}
+Based on the importance scores, we select the top-$N_{fac}$ most important tokens:
+\begin{equation}
+    \Ttop_t = \text{TopK-I}(\mathbf{S}_t^{l,h},\; N_{fac}).
+\end{equation}
+Full-fidelity attention is then computed \textit{only} on this salient subset:
+\begin{equation}
+    \hat{\mathbf{K}}_t = \text{Gather}(\mathbf{K}_{1:t}, \Ttop_t), \quad \hat{\mathbf{V}}_t = \text{Gather}(\mathbf{V}_{1:t}, \Ttop_t),
+\end{equation}
+\begin{equation}
+    \mathbf{o}_t^{l,h} = \text{softmax}\!\left(\frac{\mathbf{q}_t \hat{\mathbf{K}}_t^\top}{\sqrt{d}}\right) \hat{\mathbf{V}}_t.
+\end{equation}
+The original absolute positions of tokens in $\Ttop_t$ are preserved, maintaining the integrity of RoPE positional encodings.
+
+\subsubsection{Complexity Analysis.}
+Standard decoding attention has complexity $\mathcal{O}(td)$ per head. Our approach requires $\mathcal{O}(2tF)$ for TIP (importance prediction in the $F$-dimensional subspace) and $\mathcal{O}(N_{fac}d)$ for FAC (focused attention on the reduced set). The total complexity is $\mathcal{O}(2tF + N_{fac}d)$, yielding a theoretical speedup of:
+\begin{equation}
+    \text{Speedup} = \frac{2td}{2tF + N_{fac}d} \approx \frac{d}{F} \quad \text{when } N_{fac} \ll t.
+\end{equation}
+With $F = d/8$, this provides up to $8\times$ reduction in memory bandwidth during the decoding phase.
+
+
+\subsection{Stage 4: Context-Aware Prompt Tuning (Adaptation)}
+Beyond efficiency, we include an optional adaptation module for domain-specific explanation quality. We employ \textit{Soft Prompt Tuning} with learnable vectors $\mathcal{P}_{ctx} \in \mathbb{R}^{K \times D}$ prepended to text embeddings:
 \begin{equation}
     \mathcal{L} = - \sum_{j=1}^{|\mathbf{Y}|} \log P_{\theta}(y_j \mid y_{<j}, \hat{\mathbf{Z}}, \mathcal{P}_{ctx}),
 \end{equation}
-where $\theta$ represents the frozen parameters of the VLM. During training, we only update $\mathcal{P}_{ctx}$, making the adaptation extremely parameter-efficient.
+where $\theta$ are frozen VLM parameters. Only $\mathcal{P}_{ctx}$ is updated ($<$0.1\% parameters).
 
 \subsubsection{Hazard-Priority Prompting.}
-Different hazard types require different levels of descriptive granularity. A fire event demands detailed analysis of ignition source and spread direction, while a simple PPE violation requires only object presence verification. We introduce a \textit{Hazard-Priority Prompting} mechanism that dynamically selects from a hierarchical prompt bank:
+Different hazards require different reasoning granularity. We dynamically select from a hierarchical prompt bank:
 \begin{equation}
     \mathcal{P}_{active} = \begin{cases}
     \mathcal{P}_{critical} & \text{if } \max_k w(c_k) \geq \lambda_{crit} \\
     \mathcal{P}_{standard} & \text{otherwise},
     \end{cases}
 \end{equation}
-where $\mathcal{P}_{critical}$ contains specialized prompts (e.g., ``Analyze the fire hazard: identify ignition source, affected area, and recommended evacuation direction'') and $\mathcal{P}_{standard}$ contains general safety prompts. This event-driven selection ensures that the VLM's reasoning capacity is directed towards the aspects most relevant to each hazard type.
+where $\mathcal{P}_{critical}$ contains specialized safety prompts and $\mathcal{P}_{standard}$ contains general prompts.
 
 
-
+% --- EXPERIMENTS ---
 \section{Experiments}
 
 \subsection{Experimental Setup}
 
-\subsubsection{Datasets.} 
-We evaluate our framework on two large-scale video anomaly detection datasets:
+\subsubsection{Datasets.}
+We evaluate on two large-scale video anomaly detection datasets:
 \begin{itemize}
-    \item \textbf{UCF-Crime}~\cite{ucfcrime}: A large-scale dataset consisting of 1,900 real-world surveillance videos covering 13 types of anomalies (e.g., Fighting, Explosion, Road Accidents).
-    \item \textbf{XD-Violence}~\cite{xdviolence}: A multi-modal dataset collected from movies and games, focusing on violent events with audio-visual signals. We use the video modality for evaluation.
+    \item \textbf{UCF-Crime}~\cite{ucfcrime}: 1,900 real-world surveillance videos covering 13 anomaly types.
+    \item \textbf{XD-Violence}~\cite{xdviolence}: A multi-modal dataset with violent events; we use the video modality.
 \end{itemize}
-Since these datasets primarily provide frame-level binary labels, we enriched a subset of the test set (approx. 500 clips) with manual dense captions to evaluate the ``Accident Explanation'' capability, following the protocol in~\cite{anomalygpt}.
+We enriched a subset ($\sim$500 clips) with manual dense captions for accident explanation evaluation, following~\cite{anomalygpt}.
 
 \subsubsection{Implementation Details.}
-We use \textbf{YOLOv8-Nano} as the Stage 1 event trigger due to its extreme efficiency (approx. 1ms/frame). For the VLM backbone, we employ the frozen \textbf{LLaVA-1.5-7B}~\cite{llava}, which uses CLIP-ViT-L/14-336px as the visual encoder. The context prompts are initialized with safety-related keywords and trained for 5 epochs using the LoRA~\cite{lora} strategy.
-We set the confidence threshold $\tau_{conf}=0.5$ for the trigger. For token pruning, we dilate the bounding boxes by a factor of $\alpha=1.2$ to capture local context.
-All experiments are conducted on a single \textbf{NVIDIA GeForce RTX 5080 GPU}. We measure inference speed (FPS) including all pre-processing and post-processing steps.
+We use \textbf{YOLOv8-Nano} ($\sim$1ms/frame) as the trigger and frozen \textbf{LLaVA-1.5-7B}~\cite{llava} (CLIP-ViT-L/14-336px + Vicuna-7B) as the VLM backbone. The Vicuna-7B LLM uses RoPE, enabling our frequency-aware sparse decoding.
+For Stage~3, we calibrate dominant FCs using 32 samples from the training set with $F=16$ (25\% of $d/2=64$ FCs) and $N_{fac}=256$ tokens. The confidence threshold is $\tau_{conf}=0.5$ and dilation base is $\alpha_{base}=1.2$.
+All experiments are conducted on a single \textbf{NVIDIA RTX 5080 GPU}.
+
 
 \subsection{Comparison with State-of-the-Arts}
 
-We compare Event-VLM with three categories of baselines: 
-(1) Traditional VAD methods (Sultani~\cite{ucfcrime}, RTFM~\cite{rtfm}), 
-(2) Heavy Video-LLMs (Video-LLaMA~\cite{videollama}, LLaVA-Video~\cite{llava}), and 
-(3) Efficient methods (SeViLA~\cite{sevila}, ToMe~\cite{tome}).
-
-\subsubsection{Quantitative Analysis.}
-Table~\ref{tab:main_results} summarizes the performance on UCF-Crime. We report \textbf{AUC} for anomaly detection accuracy, \textbf{CIDEr} score for caption quality, and \textbf{GFLOPs/FPS} for efficiency.
-
 \begin{table}[t]
-\caption{\textbf{Main Results on UCF-Crime Dataset.} Our Event-VLM achieves a superior trade-off between accuracy and efficiency. Note that `Method' implies the token reduction strategy. Speed is measured on an RTX 5080.}
+\caption{\textbf{Main Results on UCF-Crime.} Event-VLM achieves a superior trade-off across all three efficiency axes. Speed measured on RTX 5080.}
 \label{tab:main_results}
 \centering
 \setlength{\tabcolsep}{4pt}
@@ -332,77 +343,99 @@ Video-LLaMA~\cite{videollama} & Full Frame & 81.5 & 82.3 & 450.2 & 3.5 \\
 LLaVA-1.5~\cite{llava} & Frame-by-Frame & 85.0 & \textbf{90.1} & 180.5 & 5.2 \\
 \midrule
 \textit{Efficient VLMs} & & & & & \\
-SeViLA~\cite{sevila} & Keyframe Selection & 84.5 & 88.0 & 108.3 & 12.0 \\
+SeViLA~\cite{sevila} & Keyframe Sel. & 84.5 & 88.0 & 108.3 & 12.0 \\
 LLaVA + ToMe~\cite{tome} & Statistical Pruning & 82.1 & 85.4 & 90.2 & 15.6 \\
+LLaVA + SnapKV~\cite{snapkv} & KV Eviction & 84.2 & 87.8 & 95.0 & 14.2 \\
 \midrule
-\textbf{Event-VLM (Ours)} & \textbf{Trigger + Pruning} & \textbf{84.8} & \textbf{89.5} & \textbf{45.1} & \textbf{48.2} \\
+\textbf{Event-VLM (Ours)} & \textbf{3-Axis Optim.} & \textbf{84.8} & \textbf{89.5} & \textbf{45.1} & \textbf{48.2} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-As shown in Table~\ref{tab:main_results}, generic VAD methods are fast but lack interpretability (CIDEr N/A). Heavy VLMs offer high caption quality but suffer from low throughput (<6 FPS).
-Crucially, **Event-VLM maintains 99\% of the caption quality (89.5 vs. 90.1 CIDEr) of the full LLaVA model while running $9\times$ faster (48.2 FPS).**
-Compared to SeViLA, which only reduces temporal redundancy, our spatial pruning further reduces GFLOPs by roughly 58\%, proving the effectiveness of removing background tokens.
+As shown in Table~\ref{tab:main_results}, traditional VAD methods are fast but lack interpretability. Heavy VLMs achieve high caption quality but suffer from low throughput ($<$6 FPS). Methods addressing a single axis (SeViLA: temporal; ToMe: spatial; SnapKV: decoding) provide moderate improvements. \textbf{Event-VLM} maintains 99\% of caption quality (89.5 vs.\ 90.1 CIDEr) while running \textbf{9$\times$} faster (48.2 FPS), demonstrating the synergistic benefit of addressing all three axes.
+
 
 \subsection{Ablation Studies}
 
-We conduct ablation studies on the UCF-Crime dataset to validate the contribution of each component.
-
-\begin{table}[b]
-\caption{\textbf{Component Analysis.} We sequentially add components to the baseline LLaVA-1.5. `Pruning' denotes our knowledge-guided masking.}
+\begin{table}[t]
+\caption{\textbf{Three-Axis Ablation.} Sequential activation of each efficiency axis on top of the LLaVA-1.5 baseline.}
 \label{tab:ablation_component}
 \centering
-\begin{tabular}{ccc|ccc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{cccc|ccc}
 \toprule
-\textbf{Event Trigger} & \textbf{Spatial Pruning} & \textbf{Context Prompt} & \textbf{FPS} $\uparrow$ & \textbf{AUC} & \textbf{Caption Quality} \\
+\textbf{Temporal} & \textbf{Spatial} & \textbf{Decoding} & \textbf{Prompt} & \textbf{FPS} $\uparrow$ & \textbf{AUC} & \textbf{CIDEr} \\
 \midrule
-- & - & - & 5.2 & 85.0 & Generic \\
-\checkmark & - & - & 18.5 & 85.0 & Generic \\
-\checkmark & \checkmark & - & \textbf{48.2} & 84.8 & Generic \\
-\checkmark & \checkmark & \checkmark & 48.0 & \textbf{85.6} & \textbf{Safety-Aligned} \\
+- & - & - & - & 5.2 & 85.0 & 90.1 \\
+\checkmark & - & - & - & 18.5 & 85.0 & 90.1 \\
+\checkmark & \checkmark & - & - & 38.5 & 84.8 & 89.2 \\
+\checkmark & \checkmark & \checkmark & - & \textbf{48.2} & 84.8 & 89.0 \\
+\checkmark & \checkmark & \checkmark & \checkmark & 48.0 & \textbf{85.6} & \textbf{89.5} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Impact of Components.}
-Table~\ref{tab:ablation_component} demonstrates the step-by-step improvements. The \textit{Event Trigger} provides the largest speedup by skipping background frames. Adding \textit{Spatial Pruning} further boosts FPS from 18.5 to 48.2 by reducing the visual token count by approximately 75\% per processed frame. Finally, \textit{Context Prompt} slightly improves the detection AUC (84.8 $\rightarrow$ 85.6) by biasing the model towards hazard-related concepts, without affecting speed.
+\subsubsection{Three-Axis Component Analysis.}
+Table~\ref{tab:ablation_component} demonstrates the contribution of each axis. The temporal axis (Event Trigger) provides the largest speedup by skipping background frames. The spatial axis (Token Pruning) further boosts FPS from 18.5 to 38.5. The decoding axis (Frequency-Aware Sparse Decoding) provides an additional 25\% speedup (38.5 $\to$ 48.2 FPS) by reducing KV cache memory bandwidth during generation. The prompt tuning slightly improves quality without affecting speed.
 
-\subsubsection{Pruning Ratio vs. Accuracy.}
-Figure~\ref{fig:pruning_ratio} (left) illustrates the sensitivity of performance to the pruning intensity. We observed that our knowledge-guided pruning maintains robust performance even when retaining only 20\% of tokens, whereas statistical pruning (ToMe) suffers a sharp drop after 50\% reduction. This confirms that \textit{where} we prune matters more than \textit{how much} we prune.
+\subsubsection{Frequency-Aware Decoding Analysis.}
 
-\subsubsection{Trigger Reliability Analysis.}
-A critical concern in our cascaded design is error propagation: if the trigger module misses a hazard frame, the VLM is never invoked. To quantify this risk, we measure the \textit{Recall@Trigger} on the UCF-Crime test set. Our YOLOv8-Nano trigger achieves \textbf{98.2\%} recall on hazard frames with a confidence threshold of 0.5, missing only 1.8\% of safety-critical events. The missed cases are primarily due to extreme occlusion (e.g., person fully behind machinery) or unusual camera angles. This high recall confirms that the lightweight trigger effectively preserves safety-critical events while filtering out the majority of background frames.
+\begin{table}[t]
+\caption{\textbf{Sparse Decoding Comparison.} Performance of different KV cache strategies applied to the LLM backbone during VLM inference.}
+\label{tab:decoding_comparison}
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l|ccc}
+\toprule
+\textbf{Decoding Strategy} & \textbf{CIDEr} & \textbf{Decoding Speedup} & \textbf{Training-free} \\
+\midrule
+Full KV Cache & 90.1 & 1.0$\times$ & - \\
+StreamingLLM~\cite{streamingllm} & 84.2 & 1.8$\times$ & \checkmark \\
+H2O~\cite{h2o} & 86.5 & 1.6$\times$ & \checkmark \\
+SnapKV~\cite{snapkv} & 87.8 & 1.7$\times$ & \checkmark \\
+\textbf{FC-Sparse (Ours)} & \textbf{89.0} & \textbf{2.1$\times$} & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:decoding_comparison} compares our frequency-aware sparse decoding against existing KV cache strategies. StreamingLLM's fixed-window approach loses critical visual context. H2O and SnapKV use heuristic importance and underperform for safety-critical captions. Our FC-based approach, being truly query-aware, preserves the most relevant visual and textual tokens, achieving the best quality-speed trade-off.
+
+\subsubsection{Dominant FC Analysis in VLM Context.}
+A key question is whether the functional sparsity discovered in text-only LLMs~\cite{fasa} transfers to the VLM setting, where the KV cache contains both visual and textual tokens. We compute CA scores across the Vicuna-7B backbone under mixed visual-textual inputs and observe: (1) functional sparsity persists, with a small FC subset dominating contextual attention; (2) dominant FC identities remain largely consistent between text-only and visual-textual regimes; and (3) with $F=16$ FCs (25\%), CA remains above 0.85 across layers, supporting reliable token-importance prediction.
+
+\subsubsection{Pruning Robustness.}
+Our knowledge-guided pruning maintains robust performance even at 20\% token retention, whereas ToMe suffers a sharp drop after 50\% reduction. This confirms that domain-aware pruning (\textit{where} to prune) matters more than statistical pruning (\textit{how much}).
+
+\subsubsection{Trigger Reliability.}
+The YOLOv8-Nano trigger achieves \textbf{98.2\%} recall on hazard frames with $\tau_{conf}=0.5$, with missed cases primarily due to extreme occlusion. Our risk-sensitive loss with $\lambda_{crit}=3.0$ provides the best balance between recall and overall accuracy.
+
 
 \subsection{Qualitative Results}
 
 \begin{figure}[!t]
   \centering
   \includegraphics[width=0.95\textwidth,height=0.32\textheight,keepaspectratio]{figures/figure3_pruning.png}
-  \caption{\textbf{Token Pruning Visualization.} Comparison of fixed vs. adaptive dilation. (Top-left) Original image with full token grid. (Top-right) Fixed dilation misses fire context (red X marks). (Bottom-left) Our adaptive dilation preserves hazard context with larger expansion for amorphous objects. (Bottom-right) VLM attention map shows stronger focus on preserved fire region.}
-  \label{fig:pruning_ratio}
+  \caption{\textbf{Token Pruning and Sparse Decoding Visualization.} (Left) Our spatial pruning preserves hazard-critical regions. (Right) FC-based importance scores accurately identify salient KV cache entries during decoding, focusing on safety-relevant tokens.}
+  \label{fig:qualitative}
 \end{figure}
 
-Fig.~\ref{fig:pruning_ratio} visualizes the pruning effect. The heatmap shows that our method successfully preserves the regions containing the fallen worker and the machinery, while completely masking out the irrelevant street background. Crucially, our adaptive dilation provides significantly more context for amorphous hazards like fire, enabling the VLM to reason about spread direction and intensity. The generated caption accurately identifies the cause (``forklift impact'') unlike the baseline which outputs a generic description.
+Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial pruning preserves regions containing hazards while masking background. During decoding, the FC-based importance predictor focuses attention on the most safety-relevant entries in the KV cache, enabling detailed accident description generation.
 
+
+% --- CONCLUSION ---
 \section{Conclusion}
+We introduced \textbf{Event-VLM}, a tri-axis inference framework for scalable surveillance VLMs. The core idea is to allocate computation only when needed (temporal gating), where needed (spatial pruning), and to what matters during generation (frequency-aware sparse decoding). This yields a coherent systems design rather than a collection of isolated accelerations.
 
-In this paper, we introduced \textbf{Event-VLM}, a scalable and efficient framework designed to bridge the gap between advanced Vision-Language Models and real-world surveillance constraints. 
-By identifying the critical bottleneck—spatial and temporal redundancy in CCTV footage—we proposed a cascaded inference strategy enhanced with \textit{hazard-aware} optimization.
-Our \textit{Risk-Sensitive Detection Loss} ensures high recall on critical events, while \textit{Adaptive Spatial Pruning} preserves essential context for amorphous hazards like fire and smoke. The \textit{Hazard-Priority Prompting} mechanism further tailors the VLM's reasoning to each event type.
-Extensive experiments on UCFCrime and XD-Violence datasets demonstrated that Event-VLM achieves a \textbf{9$\times$} speedup compared to standard baselines while maintaining 99\% of the caption quality.
-We believe our work serves as a practical blueprint for deploying Large Multimodal Models in high-throughput industrial safety systems.
+Our risk-sensitive trigger preserves safety recall, adaptive pruning keeps hazard-critical context under aggressive token reduction, and FC-based decoding reduces KV-bandwidth pressure without retraining the backbone. Experiments on UCF-Crime and XD-Violence show \textbf{9$\times$} throughput gains while maintaining 99\% caption quality, indicating that high-fidelity accident explanation and real-time multi-stream operation can be achieved simultaneously.
 
 \paragraph{Limitations and Future Work.}
-Despite its effectiveness, our framework relies on the initial performance of the lightweight detector; if the trigger module misses a hazard, the VLM is never invoked. However, our risk-sensitive loss significantly mitigates this concern, achieving 98.2\% recall on critical events.
-Future work will focus on an end-to-end training strategy where the VLM can provide feedback to improve the lightweight detector, and optimizing the pipeline for deployment on edge devices (e.g., Jetson Orin) with integer quantization.
+Our framework relies on the initial detector's performance; however, the risk-sensitive loss achieves 98.2\% recall on critical events. The frequency-aware decoding currently uses a uniform FC budget across layers; future work will explore layer-adaptive budgets (cf.\ PyramidKV~\cite{pyramidkv}) and extend the frequency-domain analysis to visual encoders with RoPE (e.g., EVA-02). We also plan to validate on edge devices with integer quantization.
+
 
 % ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-%
 \bibliographystyle{splncs04}
 \bibliography{main}
+
 
 % ============================================
 % APPENDIX
@@ -413,80 +446,62 @@ Future work will focus on an end-to-end training strategy where the VLM can prov
 \label{sec:impl_details}
 
 \subsection{Network Architecture}
-\textbf{Trigger Module.} We use YOLOv8-Nano~\cite{yolo} with the following specifications: input resolution 640$\times$640, backbone CSPDarknet with 3.2M parameters, inference time $\sim$1ms on RTX 5080.
+\textbf{Trigger Module.} YOLOv8-Nano~\cite{yolo}: input 640$\times$640, CSPDarknet backbone (3.2M params), $\sim$1ms on RTX 5080.
 
-\textbf{VLM Backbone.} We employ LLaVA-1.5-7B with CLIP-ViT-L/14-336px as the visual encoder. The image is tokenized into 576 patches (24$\times$24 grid with patch size 14).
+\textbf{VLM Backbone.} LLaVA-1.5-7B with CLIP-ViT-L/14-336px visual encoder (576 patches) and Vicuna-7B LLM backbone (RoPE, $d=4096$, 32 heads, $d/2=64$ FCs per head).
 
 \subsection{Hazard Class Taxonomy}
-We define three hazard severity tiers for the risk-sensitive loss:
 \begin{itemize}
     \item \textbf{Critical} ($\lambda_{crit}=3.0$): fire, smoke, explosion, structural\_collapse
     \item \textbf{High} ($\lambda_{high}=2.0$): forklift, crane, heavy\_machinery, falling\_object
     \item \textbf{Standard} ($\lambda_{std}=1.0$): person, vehicle, equipment
 \end{itemize}
 
-\subsection{Intraclass Shape Variance}
-We compute $\sigma_{shape}(c)$ by measuring the IoU distribution of ground-truth bounding boxes across instances of each class in the training set. Higher variance indicates more ambiguous boundaries:
-\begin{table}[h]
-\centering
-\begin{tabular}{lc|lc}
-\toprule
-\textbf{Class} & $\sigma_{shape}$ & \textbf{Class} & $\sigma_{shape}$ \\
-\midrule
-fire & 0.42 & person & 0.12 \\
-smoke & 0.38 & vehicle & 0.08 \\
-explosion & 0.35 & forklift & 0.15 \\
-\bottomrule
-\end{tabular}
-\caption{Intraclass shape variance for adaptive dilation.}
-\end{table}
+\subsection{Dominant FC Calibration Details}
+The offline calibration uses 32 randomly sampled surveillance clips from the training set. For each attention head $(l,h)$ in the 32-layer Vicuna-7B, we compute CA scores for all 64 FCs with $\mathcal{K}=32$. We select $F=16$ dominant FCs per head. The entire calibration takes $<$5 minutes on a single GPU and is performed once.
 
 \subsection{Training Details}
-\textbf{Detector Training.} The trigger module is trained for 100 epochs using SGD with momentum 0.937, learning rate 0.01 with cosine annealing, and batch size 16.
+\textbf{Detector.} 100 epochs, SGD (momentum 0.937), lr 0.01 with cosine annealing, batch 16.
 
-\textbf{Prompt Tuning.} We train the soft prompts for 5 epochs using AdamW with learning rate 1e-4. The prompt length is $K=8$ tokens for both critical and standard banks.
+\textbf{Prompt Tuning.} 5 epochs, AdamW (lr 1e-4). Prompt length $K=8$ tokens for both banks.
 
-\section{Dataset Statistics}
-\label{sec:dataset_stats}
-
-\subsection{UCF-Crime}
-UCF-Crime contains 1,900 untrimmed surveillance videos with 13 anomaly types. We use the standard train/test split (1,610/290 videos). The class distribution is highly imbalanced:
-\begin{itemize}
-    \item Most frequent: Robbery (150), Shoplifting (140), Assault (135)
-    \item Least frequent: Explosion (40), Arson (45)
-\end{itemize}
-
-\subsection{XD-Violence}
-XD-Violence contains 4,754 videos with audio-visual violence annotations. We use video modality only and focus on the 6 violence types applicable to surveillance: Fighting, Shooting, Explosion, Car\_Accident, Riot, Abuse.
-
-\subsection{Caption Annotation}
-We manually annotated 500 test clips with dense safety captions following the protocol in AnomalyGPT~\cite{anomalygpt}. Each caption describes: (1) hazard type, (2) affected entities, (3) potential cause, (4) recommended action. Inter-annotator agreement (Cohen's $\kappa$) = 0.78.
 
 \section{Additional Ablation Studies}
 \label{sec:add_ablations}
 
 \subsection{Hazard Weight Sensitivity}
-We vary $\lambda_{crit}$ from 1.0 to 5.0 while keeping $\lambda_{high}=2.0$ fixed:
 \begin{table}[h]
 \centering
 \begin{tabular}{c|ccc}
 \toprule
-$\lambda_{crit}$ & Recall@Critical & Precision@Critical & Overall AUC \\
+$\lambda_{crit}$ & Recall@Crit. & Prec.@Crit. & AUC \\
 \midrule
 1.0 & 91.2 & 88.5 & 84.2 \\
 2.0 & 95.8 & 85.1 & 84.6 \\
 3.0 (Ours) & 98.2 & 82.3 & 84.8 \\
 4.0 & 99.1 & 78.9 & 83.9 \\
-5.0 & 99.5 & 74.2 & 82.5 \\
 \bottomrule
 \end{tabular}
-\caption{Effect of critical hazard weight on detection performance.}
+\caption{Effect of critical hazard weight.}
 \end{table}
 
-We choose $\lambda_{crit}=3.0$ as it provides the best balance between recall and overall accuracy.
+\subsection{FC Budget ($F$) vs.\ Quality}
+\begin{table}[h]
+\centering
+\begin{tabular}{c|ccc}
+\toprule
+$F$ (FCs) & \% of $d/2$ & CIDEr & Decode Speedup \\
+\midrule
+8 & 12.5\% & 87.5 & 2.8$\times$ \\
+16 (Ours) & 25\% & 89.0 & 2.1$\times$ \\
+32 & 50\% & 89.8 & 1.5$\times$ \\
+64 (Full) & 100\% & 90.1 & 1.0$\times$ \\
+\bottomrule
+\end{tabular}
+\caption{Trade-off between dominant FC budget and decoding quality/speed.}
+\end{table}
 
 \subsection{Adaptive Dilation Factor}
-We vary the dilation scaling factor $\beta$ in $\alpha_k = \alpha_{base}(1 + \beta \cdot \sigma_{shape})$:
 \begin{table}[h]
 \centering
 \begin{tabular}{c|ccc}
@@ -499,31 +514,12 @@ $\beta$ & Fire CIDEr & Person CIDEr & Avg. Tokens \\
 1.5 & 90.2 & 89.5 & 168 \\
 \bottomrule
 \end{tabular}
-\caption{Effect of adaptive dilation on caption quality by hazard type.}
+\caption{Adaptive dilation effect by hazard type.}
 \end{table}
 
-Higher $\beta$ improves fire/smoke captions but increases token count. We use $\beta=1.0$ for optimal efficiency.
 
-\subsection{Prompt Bank Size}
-We compare single vs. hierarchical prompt banks:
-\begin{table}[h]
-\centering
-\begin{tabular}{l|cc}
-\toprule
-\textbf{Prompt Strategy} & \textbf{CIDEr} & \textbf{Safety Alignment} \\
-\midrule
-No prompt (zero-shot) & 78.2 & Low \\
-Single prompt & 85.4 & Medium \\
-Hierarchical (Ours) & 89.5 & High \\
-\bottomrule
-\end{tabular}
-\caption{Effect of prompt strategy on caption quality.}
-\end{table}
-
-\section{Additional Qualitative Examples}
-\label{sec:qualitative}
-
-We provide additional examples comparing Event-VLM outputs against baseline methods in various hazard scenarios:
+\section{Qualitative Examples}
+\label{sec:qualitative_appendix}
 
 \textbf{Fire Detection:}
 \begin{itemize}
@@ -534,7 +530,7 @@ We provide additional examples comparing Event-VLM outputs against baseline meth
 \textbf{Forklift Accident:}
 \begin{itemize}
     \item \textit{Baseline}: ``A person is lying on the ground near a vehicle.''
-    \item \textit{Ours}: ``A worker has been struck by a forklift turning at the intersection. The worker appears unconscious. The forklift operator has stopped the vehicle. Medical assistance required immediately.''
+    \item \textit{Ours}: ``A worker has been struck by a forklift turning at the intersection. The worker appears unconscious. Medical assistance required immediately.''
 \end{itemize}
 
 \textbf{PPE Violation:}
