@@ -1,156 +1,132 @@
-# Event-VLM: Efficient Vision-Language Models for Real-Time Surveillance
+# Event-VLM
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Event-VLM is an ECCV 2026 paper workspace for real-time surveillance video understanding with Vision-Language Models.
+This repository is organized for two parallel goals:
 
-Official implementation of **"Event-VLM: Scalable Vision-Language Models for Real-Time Industrial Surveillance"** (ECCV 2026).
+1. method and evidence development,
+2. paper-quality iteration with strict version tracking.
 
-## 🚀 Highlights
+## Project focus
 
-- **9× speedup** compared to standard VLM baselines
-- **75% FLOPs reduction** via knowledge-guided token pruning
-- **Training-free** spatial pruning with semantic awareness
-- **Hazard-aware** optimization for safety-critical applications
+Event-VLM targets three inference bottlenecks at once:
 
-## 📦 Installation
+- temporal redundancy: avoid running heavy VLM inference on non-event frames,
+- spatial redundancy: keep only hazard-relevant visual tokens,
+- decoding redundancy: reduce KV-cache access cost during generation.
+
+The current draft also separates two evaluation variants:
+
+- `Event-VLM-Core`: stages 1-3,
+- `Event-VLM-Full`: Core + prompt adaptation.
+
+## Repository layout
+
+```text
+eccv2026/
+├── src/                        # model and pipeline implementation
+├── experiments/                # training/eval scripts
+│   ├── configs/                # dataset/runtime configs
+│   └── coordination/           # Ubuntu/secure-VM sync docs
+├── scripts/                    # one-click and utility scripts
+├── paper/                      # LaTeX manuscript + versioned snapshots
+│   ├── reviews/                # review outputs and team deliverables
+│   └── versions/               # immutable vN snapshots
+└── team/                       # role definitions and operating model
+```
+
+## Environment setup
 
 ```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/event-vlm.git
-cd event-vlm
+git clone <repo-url>
+cd eccv2026
 
-# Create conda environment
-conda create -n event-vlm python=3.10 -y
-conda activate event-vlm
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install package
-pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
 
-## 🏗️ Project Structure
+## Run evaluation
 
-```
-event-vlm/
-├── src/                    # Core implementation
-│   ├── detector/           # Stage 1: Event-Triggered Gating
-│   ├── pruning/            # Stage 2: Knowledge-Guided Token Pruning
-│   ├── vlm/                # Stage 3: VLM with Hazard-Priority Prompting
-│   └── pipeline/           # End-to-end inference
-├── experiments/            # Training & evaluation scripts
-├── data/                   # Dataset management
-└── paper/                  # LaTeX source
-```
-
-## 🎯 Quick Start
-
-### Inference
-
-```python
-from src.pipeline import EventVLM
-
-# Initialize pipeline
-model = EventVLM(
-    detector="detr-l",      # or "yolov8s"
-    vlm="llava-1.5-7b",
-    device="cuda"
-)
-
-# Process video
-result = model.process_video("path/to/video.mp4")
-print(result.captions)
-```
-
-### Training Detector with Risk-Sensitive Loss
+### Single-run evaluation
 
 ```bash
-python experiments/train_detector.py \
-    --config experiments/configs/ucf_crime.yaml \
-    --detector detr-l \
-    --lambda_crit 3.0 \
-    --lambda_high 2.0
-```
-
-### Evaluation
-
-```bash
-# UCF-Crime benchmark
 python experiments/evaluate.py --config experiments/configs/ucf_crime.yaml
-
-# XD-Violence benchmark
 python experiments/evaluate.py --config experiments/configs/xd_violence.yaml
+```
 
-# Multi-seed (mean/std/CI) aggregation
+### Multi-seed aggregation (recommended for paper numbers)
+
+```bash
 python experiments/multi_seed_eval.py \
   --configs experiments/configs/ucf_crime.yaml experiments/configs/xd_violence.yaml \
   --seeds 41,42,43 \
-  --variants core,full
+  --variants core,full \
+  --detector detr-l \
+  --output-dir outputs/multi_seed_eval
 ```
 
-### Auto-Tuning with Optuna
+Expected outputs:
+
+- `outputs/multi_seed_eval/summary.json`
+- `outputs/multi_seed_eval/summary.md`
+
+### One-click server execution (when server access is available)
 
 ```bash
-python experiments/auto_tune.py \
-    --config experiments/configs/base.yaml \
-    --n_trials 100 \
-    --study_name event_vlm_tuning
+bash scripts/server_ready_one_click.sh
 ```
 
-## 📊 Benchmarks
+## Paper workflow
 
-### UCF-Crime
+### Build manuscript
 
-| Method | AUC (%) | FPS | Speedup |
-|--------|---------|-----|---------|
-| LLaVA-1.5 (baseline) | 85.2 | 5.4 | 1.0× |
-| Video-LLaMA | 83.8 | 4.2 | 0.8× |
-| **Event-VLM (Ours)** | **85.6** | **48.2** | **9.0×** |
-
-### XD-Violence
-
-| Method | AP (%) | FPS | Speedup |
-|--------|--------|-----|---------|
-| LLaVA-1.5 (baseline) | 78.4 | 5.1 | 1.0× |
-| Video-LLaMA | 76.9 | 3.8 | 0.7× |
-| **Event-VLM (Ours)** | **79.1** | **45.8** | **9.0×** |
-
-## 🔧 Configuration
-
-Key hyperparameters in `experiments/configs/base.yaml`:
-
-```yaml
-detector:
-  model: "detr-l"           # detr-l, yolov8s, yolov8n
-  conf_threshold: 0.5
-  risk_weights:
-    critical: 3.0           # fire, smoke, collapse
-    high: 2.0               # forklift, machinery
-    standard: 1.0           # person, vehicle
-
-pruning:
-  alpha_base: 1.2           # Base dilation factor
-  beta: 0.5                 # Adaptive dilation coefficient
-  
-vlm:
-  model: "llava-1.5-7b"
-  quantization: "4bit"
-  prompt_strategy: "hazard_priority"
+```bash
+export PATH="$(pwd)/.texlive/TinyTeX/bin/universal-darwin:$PATH"
+cd paper
+latexmk -pdf -interaction=nonstopmode -halt-on-error -output-directory=build main.tex
 ```
 
-## 📝 Citation
+### Versioning policy
+
+- every major paper change produces a new `paper/versions/vN/` snapshot,
+- top-level PDF is mirrored as `paper/Event-VLM-paper-vN.pdf`,
+- changelog is tracked in `paper/versions/CHANGELOG.md`.
+
+## Team workflow
+
+- team roles: `team/README.md`
+- non-experiment immediate action board: `team/09_non-experiment-next-actions-2026-02-17.md`
+- reviewer outputs and execution artifacts: `paper/reviews/`
+
+## External environment sync
+
+Use `experiments/coordination/` as the single source of truth for cross-environment handoff:
+
+- `SERVER_READY_CHECKLIST.md`
+- `LOCAL_UBUNTU_SYNC_BOARD.md`
+- `SECURE_VM_SYNC_PROTOCOL.md`
+- `EXPERIMENT_REQUEST_QUEUE.md`
+- `RUN_LOG.md`
+- `ARTIFACT_REGISTRY.md`
+
+## Current status
+
+This repository currently tracks a draft-phase paper with pilot evidence and active hardening toward submission-grade statistical reporting.
+For latest manuscript outputs, check `paper/versions/README.md`.
+
+## Citation
 
 ```bibtex
-@inproceedings{event-vlm,
-  title={Event-VLM: Scalable Vision-Language Models for Real-Time Industrial Surveillance},
-  author={Your Name},
+@inproceedings{event_vlm_2026,
+  title={Event-VLM: Three-Axis Efficient Inference for Real-time Surveillance Video Understanding},
+  author={Anonymous Authors},
   booktitle={European Conference on Computer Vision (ECCV)},
   year={2026}
 }
 ```
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT. See `LICENSE`.
