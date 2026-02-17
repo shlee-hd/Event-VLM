@@ -15,3 +15,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v4`: cross-dataset evidence + statistical scope clarification snapshot (`paper/versions/v4/`)
 - `v5`: formatting/readability polish snapshot (`paper/versions/v5/`)
 - `v6`: additional validity experiments snapshot (`paper/versions/v6/`)
+- `v7`: reviewer-audit hardening + traceability snapshot (`paper/versions/v7/`)

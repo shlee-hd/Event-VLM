@@ -1,5 +1,20 @@
 # Event-VLM Paper Changelog
 
+## v7 (2026-02-17)
+- Integrated reviewer-team full audit and applied targeted manuscript hardening:
+  - added stress-test protocol details for event-density and runtime-shift analyses,
+  - clarified decoding speedup equation with exact form and asymptotic interpretation,
+  - added explicit stream-capacity computation formula in experiments,
+  - added appendix derivation note for decoding complexity assumptions,
+  - added claim-to-evidence traceability table for faster reviewer verification.
+- Added reviewer audit report:
+  - `paper/reviews/2026-02-17_reviewer-team_full-audit_v6.md`
+- Snapshot artifacts:
+  - `paper/versions/v7/main.tex`
+  - `paper/versions/v7/main.bib`
+  - `paper/versions/v7/Event-VLM-paper-v7.pdf`
+  - `paper/Event-VLM-paper-v7.pdf`
+
 ## v6 (2026-02-17)
 - Added more validity-focused experiments in main text and appendix:
   - latency decomposition + stream-capacity table,
