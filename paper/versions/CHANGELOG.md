@@ -1,5 +1,17 @@
 # Event-VLM Paper Changelog
 
+## v5 (2026-02-17)
+- Applied post-v4 formatting and readability polish:
+  - removed title line-break token that caused hyperref PDF-string warnings,
+  - reduced major table-width overflow by resizing wide comparison tables,
+  - simplified long Related Work / Results / Conclusion sentences to reduce overfull lines,
+  - standardized appendix table float specifiers from `[h]` to `[ht]`.
+- Snapshot artifacts:
+  - `paper/versions/v5/main.tex`
+  - `paper/versions/v5/main.bib`
+  - `paper/versions/v5/Event-VLM-paper-v5.pdf`
+  - `paper/Event-VLM-paper-v5.pdf`
+
 ## v4 (2026-02-17)
 - Applied claim-beautification and evidence-coverage edits on top of v3:
   - added cross-dataset main-results table on XD-Violence under unified protocol,
