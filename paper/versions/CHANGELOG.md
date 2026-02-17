@@ -1,5 +1,16 @@
 # Event-VLM Paper Changelog
 
+## v8 (2026-02-17)
+- Applied post-v7 readability/layout polish:
+  - refined related-work and results prose for tighter reviewer readability,
+  - simplified traceability table labels to reduce layout fragility,
+  - recompiled and validated clean layout warning state in `build/main.log`.
+- Snapshot artifacts:
+  - `paper/versions/v8/main.tex`
+  - `paper/versions/v8/main.bib`
+  - `paper/versions/v8/Event-VLM-paper-v8.pdf`
+  - `paper/Event-VLM-paper-v8.pdf`
+
 ## v7 (2026-02-17)
 - Integrated reviewer-team full audit and applied targeted manuscript hardening:
   - added stress-test protocol details for event-density and runtime-shift analyses,
