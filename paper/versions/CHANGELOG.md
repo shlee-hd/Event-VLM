@@ -1,5 +1,20 @@
 # Event-VLM Paper Changelog
 
+## v10 (2026-02-18)
+- Introduced publication-style horizontal figure redesign across all main figures:
+  - unified tone and visual language for Fig.1/2/3 with cleaner typography and consistent palette,
+  - switched figure assets from square layouts to horizontal rectangular compositions for better page integration.
+- Updated manuscript figure includes to width-driven placement (removed aggressive trim pipeline).
+- Fixed LaTeX build reliability by adding `scripts/build_paper.sh`:
+  - auto-detects local TinyTeX path,
+  - falls back to `pdftex + bibtex + 2x rerun` when `latexmk` is unavailable in `PATH`.
+- Updated root README build instructions to use the stable build script.
+- Snapshot artifacts:
+  - `paper/versions/v10/main.tex`
+  - `paper/versions/v10/main.bib`
+  - `paper/versions/v10/Event-VLM-paper-v10.pdf`
+  - `paper/Event-VLM-paper-v10.pdf`
+
 ## v9 (2026-02-18)
 - Finalized figure readability/scale corrections after v8 PDF inspection:
   - enlarged Fig.1 by removing restrictive height cap and correcting trim to avoid left/right clipping,

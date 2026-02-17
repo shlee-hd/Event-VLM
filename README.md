@@ -83,10 +83,12 @@ bash scripts/server_ready_one_click.sh
 ### Build manuscript
 
 ```bash
-export PATH="$(pwd)/.texlive/TinyTeX/bin/universal-darwin:$PATH"
-cd paper
-latexmk -pdf -interaction=nonstopmode -halt-on-error -output-directory=build main.tex
+bash scripts/build_paper.sh
 ```
+
+Notes:
+- `scripts/build_paper.sh` auto-detects local TinyTeX at `.texlive/TinyTeX/bin/universal-darwin`.
+- if `latexmk` is unavailable in `PATH`, it falls back to `pdftex + bibtex + 2x rerun`.
 
 ### Versioning policy
 

@@ -12,6 +12,13 @@ Owner: MLE & Infra Team
 - [ ] output schema fixed (`summary.json`, `summary.md`, run-level metrics)
 - [ ] seed plumbing verified in evaluate pipeline
 
+## Build Reliability Memory (Resolved)
+- Root cause: LaTeX build intermittently failed when `latexmk` was not on `PATH` even though local TinyTeX existed in repo.
+- Permanent fix: add `scripts/build_paper.sh` to pin TinyTeX path and provide fallback build chain.
+- Verified command:
+  - `bash scripts/build_paper.sh`
+  - output: `paper/build/main.pdf`
+
 ## Environment Handoff Docs
 - [ ] `experiments/coordination/SERVER_READY_CHECKLIST.md` aligned with latest scripts
 - [ ] `experiments/coordination/LOCAL_UBUNTU_SYNC_BOARD.md` fields sufficient for traceability
