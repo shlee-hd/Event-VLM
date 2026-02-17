@@ -1,5 +1,18 @@
 # Event-VLM Paper Changelog
 
+## v6 (2026-02-17)
+- Added more validity-focused experiments in main text and appendix:
+  - latency decomposition + stream-capacity table,
+  - event-density stress test table,
+  - runtime robustness table across resolution/decode-length settings,
+  - trigger-threshold sensitivity table,
+  - calibration overhead/amortization table.
+- Snapshot artifacts:
+  - `paper/versions/v6/main.tex`
+  - `paper/versions/v6/main.bib`
+  - `paper/versions/v6/Event-VLM-paper-v6.pdf`
+  - `paper/Event-VLM-paper-v6.pdf`
+
 ## v5 (2026-02-17)
 - Applied post-v4 formatting and readability polish:
   - removed title line-break token that caused hyperref PDF-string warnings,

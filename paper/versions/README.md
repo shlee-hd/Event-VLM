@@ -14,3 +14,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v3`: evidence-hardening Draft V1.1 snapshot (`paper/versions/v3/`)
 - `v4`: cross-dataset evidence + statistical scope clarification snapshot (`paper/versions/v4/`)
 - `v5`: formatting/readability polish snapshot (`paper/versions/v5/`)
+- `v6`: additional validity experiments snapshot (`paper/versions/v6/`)
