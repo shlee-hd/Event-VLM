@@ -1,5 +1,17 @@
 # Event-VLM Paper Changelog
 
+## v4 (2026-02-17)
+- Applied claim-beautification and evidence-coverage edits on top of v3:
+  - added cross-dataset main-results table on XD-Violence under unified protocol,
+  - added explicit quality-retention table quantifying near-99\% caption preservation with 9$\times$ throughput gains,
+  - added statistical-sufficiency scope statement in experiments and final-release protocol in appendix,
+  - resolved major table-width formatting issues and recompiled with local TinyTeX toolchain.
+- Snapshot artifacts:
+  - `paper/versions/v4/main.tex`
+  - `paper/versions/v4/main.bib`
+  - `paper/versions/v4/Event-VLM-paper-v4.pdf`
+  - `paper/Event-VLM-paper-v4.pdf`
+
 ## v3 (2026-02-17)
 - Applied evidence-hardening edits on top of v2:
   - anonymized review metadata block (year/alignment with ECCV 2026 review mode),
