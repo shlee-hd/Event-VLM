@@ -11,3 +11,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v0`: initial baseline draft PDF (`paper/Event-vlm-paper-v0.pdf`)
 - `v1`: first full draft PDF (`paper/Event-VLM-paper-v1.pdf`)
 - `v2`: claim-polished Draft V1 snapshot (`paper/versions/v2/`)
+- `v3`: evidence-hardening Draft V1.1 snapshot (`paper/versions/v3/`)

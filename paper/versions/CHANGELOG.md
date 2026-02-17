@@ -1,5 +1,19 @@
 # Event-VLM Paper Changelog
 
+## v3 (2026-02-17)
+- Applied evidence-hardening edits on top of v2:
+  - anonymized review metadata block (year/alignment with ECCV 2026 review mode),
+  - added explicit evaluation protocol and fairness subsection,
+  - resolved main/ablation model-definition ambiguity via `Event-VLM-Core` and `Event-VLM-Full`,
+  - integrated `figure2_components.png` into main text as component-wise efficiency breakdown,
+  - unified Stage-3 operator notation (`TopK-I`),
+  - added reproducibility checklist and failure-case taxonomy in appendix.
+- Snapshot artifacts:
+  - `paper/versions/v3/main.tex`
+  - `paper/versions/v3/main.bib`
+  - `paper/versions/v3/Event-VLM-paper-v3.pdf`
+  - `paper/Event-VLM-paper-v3.pdf`
+
 ## v2 (2026-02-17)
 - Reframed core narrative around three-axis compute allocation (when/where/which).
 - Strengthened abstract, introduction, contributions, Stage-3 framing, and conclusion.
