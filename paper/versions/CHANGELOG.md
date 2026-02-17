@@ -1,5 +1,18 @@
 # Event-VLM Paper Changelog
 
+## v9 (2026-02-18)
+- Finalized figure readability/scale corrections after v8 PDF inspection:
+  - enlarged Fig.1 by removing restrictive height cap and correcting trim to avoid left/right clipping,
+  - aligned Fig.2 semantic role with its actual content (hazard-aware components) and removed in-image title duplication,
+  - tightened Fig.3 framing with conservative trim while preserving content boundaries.
+- Updated method-analysis prose to match Fig.2 semantics (design-details support, not axis ablation chart).
+- Recompiled with local TinyTeX pipeline (`pdftex -fmt=pdflatex`, `bibtex`, double rerun) and confirmed successful PDF generation.
+- Snapshot artifacts:
+  - `paper/versions/v9/main.tex`
+  - `paper/versions/v9/main.bib`
+  - `paper/versions/v9/Event-VLM-paper-v9.pdf`
+  - `paper/Event-VLM-paper-v9.pdf`
+
 ## v8 (2026-02-17)
 - Applied post-v7 readability/layout polish:
   - refined related-work and results prose for tighter reviewer readability,

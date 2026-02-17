@@ -20,3 +20,9 @@ Scope: execute next steps for all teams except Experiment Team.
 
 ## Quality Rule
 - No claim text escalation to abstract/conclusion until Reviewer Team and Release & Risk Team both sign off.
+
+## Progress Update (2026-02-18)
+- Reviewer Team: `paper/reviews/2026-02-18_reviewer-full-audit.md` 제출 (PARTIAL, figure audit complete, benchmark expansion P1 open).
+- Writing & Figure Team: `paper/reviews/2026-02-18_writing-figure-polish-plan.md` 업데이트 (PARTIAL, v9 figure/layout corrections 반영).
+- Data & Benchmark Team: `paper/reviews/2026-02-18_benchmark-expansion-plan.md` 업데이트 (P0 open, 추가 benchmark 필요로 확정).
+- Release & Risk Team: `paper/reviews/2026-02-18_release-risk-gate.md` 업데이트 (v8 figure risk closed in v9).

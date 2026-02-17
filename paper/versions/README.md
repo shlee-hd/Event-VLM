@@ -17,3 +17,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v6`: additional validity experiments snapshot (`paper/versions/v6/`)
 - `v7`: reviewer-audit hardening + traceability snapshot (`paper/versions/v7/`)
 - `v8`: post-review readability/layout polish snapshot (`paper/versions/v8/`)
+- `v9`: figure visibility/layout correction + benchmark extension plan snapshot (`paper/versions/v9/`)
