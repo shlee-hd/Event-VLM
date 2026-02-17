@@ -22,9 +22,6 @@ import numpy as np
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.config import load_config
-from experiments.evaluate import evaluate
-
 
 PROMPT_STRATEGY_MAP = {
     "core": "standard",
@@ -157,6 +154,10 @@ def main() -> None:
         help="Maximum videos to evaluate"
     )
     args = parser.parse_args()
+
+    # Lazy import so `--help` works even before heavy ML deps are installed.
+    from src.config import load_config
+    from experiments.evaluate import evaluate
 
     seeds = [int(seed) for seed in parse_csv(args.seeds)]
     variants = parse_csv(args.variants)
