@@ -20,3 +20,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v9`: figure visibility/layout correction + benchmark extension plan snapshot (`paper/versions/v9/`)
 - `v10`: horizontal high-polish figure redesign + stable paper build script snapshot (`paper/versions/v10/`)
 - `v11`: figure-storyline relayout (incl. new frontier figure), citation expansion, and v11 reviewer follow-up snapshot (`paper/versions/v11/`)
+- `v12`: benchmark/statistical expansion run-readiness snapshot (third benchmark config + paired significance pipeline) (`paper/versions/v12/`)

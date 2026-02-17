@@ -603,7 +603,7 @@ Table~\ref{tab:runtime_robustness} indicates that the proposed three-axis strate
 Similar to Table~\ref{tab:event_density}, this is a robustness study under protocol shifts for the same model family.
 
 \subsubsection{Statistical Sufficiency and Current Scope.}
-This Draft V1 reports deterministic pilot runs (single-seed execution) to validate systems-level trends before full statistical release. For the final version, we will add 3-seed repetitions for each reproduced VLM setting, 95\% bootstrap confidence intervals for AUC/CIDEr, and paired significance tests on per-video metrics. In this draft, small deltas (within $\pm$0.4 AUC or $\pm$0.5 CIDEr) should be interpreted as directional rather than conclusive.
+This Draft V1 reports deterministic pilot runs (single-seed execution) to validate systems-level trends before full statistical release. For the final version, we will add 3-seed repetitions for each reproduced VLM setting, 95\% bootstrap confidence intervals for AUC/CIDEr, and paired significance tests on per-video metrics. We also schedule an additional surveillance benchmark (ShanghaiTech-style protocol) to reduce cross-dataset generalization risk. In this draft, small deltas (within $\pm$0.4 AUC or $\pm$0.5 CIDEr) should be interpreted as directional rather than conclusive.
 
 
 \subsection{Qualitative Results}
@@ -707,6 +707,7 @@ Robust scaling under shifts & Tables~\ref{tab:latency_stream}, \ref{tab:event_de
     \item \textbf{Repetition}: 3 random seeds per reproduced setting (baseline and Event-VLM variants).
     \item \textbf{Uncertainty}: 95\% bootstrap confidence intervals for AUC and CIDEr at the video level.
     \item \textbf{Significance}: paired tests between LLaVA-1.5 baseline and Event-VLM variants on matched samples.
+    \item \textbf{Benchmark Extension}: add one additional surveillance anomaly benchmark under the same runtime protocol for cross-distribution validation.
     \item \textbf{Reporting Policy}: claims of ``quality-preserving'' speedup in the camera-ready version will be tied to confidence intervals, not only point estimates.
 \end{itemize}
 

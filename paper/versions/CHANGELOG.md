@@ -1,5 +1,24 @@
 # Event-VLM Paper Changelog
 
+## v12 (2026-02-18)
+- Added ready-to-run benchmark/statistical expansion infrastructure (non-execution phase):
+  - new third-benchmark config template: `experiments/configs/shanghaitech.yaml`,
+  - new paired significance runner for anomaly metrics: `experiments/paired_significance.py`,
+  - extended experiment entry scripts to accept configurable benchmark sets and optional significance phase:
+    - `scripts/run_experiments.sh`
+    - `scripts/server_ready_one_click.sh`.
+- Updated `experiments/evaluate.py` prediction export schema to include per-video `label` and `reference_caption` for paired post-hoc analysis.
+- Upgraded coordination artifacts for immediate server execution:
+  - request queue, local sync board, server checklist, and coordination README now include 3-benchmark + significance workflow.
+- Updated benchmark expansion review doc to READY-TO-EXECUTE state:
+  - `paper/reviews/2026-02-18_benchmark-expansion-plan.md`.
+- Added manuscript scope line for final statistical release to explicitly include one additional surveillance benchmark.
+- Snapshot artifacts:
+  - `paper/versions/v12/main.tex`
+  - `paper/versions/v12/main.bib`
+  - `paper/versions/v12/Event-VLM-paper-v12.pdf`
+  - `paper/Event-VLM-paper-v12.pdf`
+
 ## v11 (2026-02-18)
 - Reframed figure storyline to improve paper-level communication quality:
   - kept high-detail method figures (Fig.1/2/3),

@@ -5,6 +5,8 @@ Use this queue for all requested runs before execution.
 | Request ID | Date | Requested By | Priority | Dataset | Variant | Seeds | Purpose | Status |
 |---|---|---|---|---|---|---|---|---|
 | REQ-001 | 2026-02-17 | Main Team | P0 | UCF + XD | core, full | 41,42,43 | Multi-seed CI evidence hardening | TODO |
+| REQ-002 | 2026-02-18 | Main Team | P0 | UCF + XD + ShanghaiTech | none, core, full | 41,42,43 | Third-benchmark expansion with unified protocol | TODO |
+| REQ-003 | 2026-02-18 | Reviewer Team | P0 | UCF + XD + ShanghaiTech | none vs core/full | 41,42,43 | Paired significance report (AUC/AP bootstrap + permutation) | TODO |
 
 ## Status Definition
 - `TODO`: request accepted, not started.

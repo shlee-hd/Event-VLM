@@ -19,11 +19,13 @@ Use this checklist on the first day when experiment infrastructure becomes acces
 - [ ] quick sanity run succeeds.
 - [ ] summary files generated.
 - [ ] run log updated in this coordination folder.
+- [ ] benchmark config paths validated (`ucf_crime`, `xd_violence`, `shanghaitech`).
 
 ## D. Full Run
 - [ ] full multi-seed run started via one-click script.
 - [ ] run IDs and ETA recorded in `RUN_LOG.md`.
 - [ ] artifacts registered in `ARTIFACT_REGISTRY.md`.
+- [ ] paired significance scripts executed (`none vs core/full`).
 
 ## E. Sync Back to Main Workspace
 - [ ] key outputs copied or pushed.

@@ -167,6 +167,8 @@ def evaluate(
                 "score": 0.0,
                 "triggered": any(r.is_event for r in result.frame_results),
                 "caption": "",
+                "reference_caption": video_info.get("caption", ""),
+                "label": int(video_info.get("label", 0)),
                 "fps": result.fps
             }
             

@@ -1,0 +1,35 @@
+# ShanghaiTech Campus benchmark configuration
+# Inherits from base.yaml
+
+defaults:
+  - base
+
+data:
+  name: "shanghaitech"
+  root_dir: "data/shanghaitech"
+  frame_rate: 1
+  max_frames: 450
+
+# Approximate safety/anomaly label mapping for trigger prioritization
+detector:
+  hazard_classes:
+    critical:
+      - explosion
+      - fire
+      - violent_event
+    high:
+      - fighting
+      - robbery
+      - theft
+    standard:
+      - trespassing
+      - loitering
+      - crowding
+
+evaluation:
+  split: "test"
+  metrics:
+    - auc
+    - ap
+    - fps
+    - token_reduction
