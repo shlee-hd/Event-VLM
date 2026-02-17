@@ -1,5 +1,20 @@
 # Event-VLM Paper Changelog
 
+## v11 (2026-02-18)
+- Reframed figure storyline to improve paper-level communication quality:
+  - kept high-detail method figures (Fig.1/2/3),
+  - added a new quantitative frontier visualization (`figure4_frontier.png`) and integrated it into the main results narrative.
+- Fixed the primary figure layout issue by cropping `figure1_architecture.png` to horizontal ratio (removing large embedded top/bottom whitespace that previously made the figure look underscaled in PDF pages).
+- Applied reviewer-driven writing polish in title/abstract/introduction/related-work language.
+- Expanded cited literature breadth in `main.tex` from 46 to 61 unique citation keys (targeting broader reviewer expectations).
+- Added reviewer follow-up memo:
+  - `paper/reviews/2026-02-18_reviewer-followup-v11_figures-benchmarks.md`
+- Rebuilt with stable pipeline (`scripts/build_paper.sh`) and captured snapshot artifacts:
+  - `paper/versions/v11/main.tex`
+  - `paper/versions/v11/main.bib`
+  - `paper/versions/v11/Event-VLM-paper-v11.pdf`
+  - `paper/Event-VLM-paper-v11.pdf`
+
 ## v10 (2026-02-18)
 - Introduced publication-style horizontal figure redesign across all main figures:
   - unified tone and visual language for Fig.1/2/3 with cleaner typography and consistent palette,
