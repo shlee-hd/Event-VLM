@@ -8,6 +8,7 @@ import argparse
 import json
 import logging
 import time
+import random
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -29,6 +30,15 @@ from src.utils.metrics import (
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def set_global_seed(seed: int) -> None:
+    """Set global RNG seed for reproducible evaluation runs."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
 class VideoDataset:
@@ -103,6 +113,9 @@ def evaluate(
     Returns:
         Dict of metric name to value
     """
+    set_global_seed(config.seed)
+    logger.info(f"Using evaluation seed: {config.seed}")
+
     # Initialize model
     logger.info("Initializing Event-VLM...")
     model = EventVLM(config=config, device=config.device)
@@ -283,6 +296,12 @@ def main():
         default="cuda",
         help="Device to use"
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override random seed for reproducible evaluation"
+    )
     
     args = parser.parse_args()
     
@@ -293,6 +312,8 @@ def main():
     if args.detector:
         config.detector.model = args.detector
     config.device = args.device
+    if args.seed is not None:
+        config.seed = args.seed
     
     # Run evaluation
     metrics = evaluate(

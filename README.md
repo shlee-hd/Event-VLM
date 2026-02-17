@@ -82,6 +82,12 @@ python experiments/evaluate.py --config experiments/configs/ucf_crime.yaml
 
 # XD-Violence benchmark
 python experiments/evaluate.py --config experiments/configs/xd_violence.yaml
+
+# Multi-seed (mean/std/CI) aggregation
+python experiments/multi_seed_eval.py \
+  --configs experiments/configs/ucf_crime.yaml experiments/configs/xd_violence.yaml \
+  --seeds 41,42,43 \
+  --variants core,full
 ```
 
 ### Auto-Tuning with Optuna

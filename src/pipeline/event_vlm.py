@@ -210,10 +210,24 @@ class EventVLM:
             result.tokens_used = result.tokens_total
         
         # Stage 3: Context-Aware Generation
-        prompt = self.prompting(
-            hazard_level=detection_result.max_hazard_level,
-            detected_classes=[d.class_name for d in detection_result.detections]
-        )
+        detected_classes = [d.class_name for d in detection_result.detections]
+        prompt_strategy = getattr(self.config.vlm, "prompt_strategy", "hazard_priority")
+
+        if prompt_strategy == "standard":
+            prompt = self.prompting.select_prompt(
+                hazard_level="standard",
+                detected_classes=detected_classes
+            )
+        elif prompt_strategy == "none":
+            prompt = (
+                "Describe what is happening in this surveillance footage. "
+                "Focus on safety-relevant observations."
+            )
+        else:
+            prompt = self.prompting(
+                hazard_level=detection_result.max_hazard_level,
+                detected_classes=detected_classes
+            )
         
         vlm_output = self.vlm.generate(
             image=image_pil,

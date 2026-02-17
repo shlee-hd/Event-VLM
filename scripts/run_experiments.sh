@@ -10,12 +10,16 @@ echo "========================================"
 # Parse arguments
 QUICK=""
 TUNING=""
+MULTI_SEED=""
+SEEDS="41,42,43"
 DETECTOR="detr-l"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --quick) QUICK="--quick" ;;
         --tuning) TUNING="true" ;;
+        --multi-seed) MULTI_SEED="true" ;;
+        --seeds) SEEDS="$2"; shift ;;
         --detector) DETECTOR="$2"; shift ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
@@ -29,6 +33,9 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "Output directory: $OUTPUT_DIR"
 echo "Detector: $DETECTOR"
+if [ "$MULTI_SEED" = "true" ]; then
+    echo "Multi-seed: enabled (seeds=$SEEDS)"
+fi
 echo ""
 
 # Run unit tests first
@@ -70,6 +77,21 @@ if [ "$TUNING" = "true" ]; then
         --n-trials 50 \
         --output-dir "$OUTPUT_DIR/tuning" \
         --visualize \
+        $QUICK
+fi
+
+# Run multi-seed aggregation if requested
+if [ "$MULTI_SEED" = "true" ]; then
+    echo ""
+    echo "========================================"
+    echo "Running multi-seed evaluation..."
+    echo "========================================"
+    python experiments/multi_seed_eval.py \
+        --configs experiments/configs/ucf_crime.yaml experiments/configs/xd_violence.yaml \
+        --seeds "$SEEDS" \
+        --variants core,full \
+        --detector "$DETECTOR" \
+        --output-dir "$OUTPUT_DIR/multi_seed" \
         $QUICK
 fi
 

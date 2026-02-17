@@ -12,6 +12,20 @@ Datasets:
 - UCF-Crime
 - XD-Violence
 
+## Canonical Command
+```bash
+python experiments/multi_seed_eval.py \
+  --configs experiments/configs/ucf_crime.yaml experiments/configs/xd_violence.yaml \
+  --seeds 41,42,43 \
+  --variants core,full \
+  --detector detr-l \
+  --output-dir outputs/multi_seed_eval
+```
+
+Outputs:
+- `outputs/multi_seed_eval/summary.json`
+- `outputs/multi_seed_eval/summary.md`
+
 ## Metrics to Collect
 - AUC
 - CIDEr
