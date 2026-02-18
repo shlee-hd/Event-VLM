@@ -540,24 +540,8 @@ As event density increases, throughput degrades gracefully rather than collapsin
 This internal scaling table is moved to the appendix to keep the main narrative focused on headline comparisons.
 
 \subsubsection{Protocol Robustness Across Resolution and Decode Length.}
-\begin{table}[t]
-\caption{\textbf{Robustness to Runtime Protocol Variations.} Event-VLM-Core retains near-baseline quality across resolution and generation-length changes.}
-\label{tab:runtime_robustness}
-\centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{c|c|cc}
-\toprule
-\textbf{Resolution} & \textbf{Max Gen Len} & \textbf{CIDEr Retention} & \textbf{FPS Gain} \\
-\midrule
-224px & 128 & 99.2\% (88.3/89.0) & 9.07$\times$ (73.5/8.1) \\
-336px & 256 & 98.8\% (89.0/90.1) & 9.27$\times$ (48.2/5.2) \\
-448px & 384 & 98.5\% (89.2/90.6) & 8.52$\times$ (26.4/3.1) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:runtime_robustness} indicates that the proposed three-axis strategy is robust to deployment-level runtime changes. The quality-retention trend remains near 99\% while speed gains stay above 8.5$\times$ even under heavier 448px/384-token settings.
-Similar to Table~\ref{tab:event_density}, this is a robustness study under protocol shifts for the same model family and is not used for headline SOTA claims.
+Appendix Table~\ref{tab:runtime_robustness} indicates that the proposed three-axis strategy is robust to deployment-level runtime changes. The quality-retention trend remains near 99\% while speed gains stay above 8.5$\times$ even under heavier 448px/384-token settings.
+This protocol-shift robustness table is moved to the appendix to reduce main-text footprint.
 
 \subsubsection{Statistical Sufficiency and Current Scope.}
 This Draft V1 reports deterministic pilot runs (single-seed execution) to validate systems-level trends before full statistical release. For the final version, we will add 3-seed repetitions for each reproduced VLM setting, 95\% bootstrap confidence intervals for AUC/CIDEr, and paired significance tests on per-video metrics. We also schedule an additional surveillance benchmark (ShanghaiTech-style protocol) to reduce cross-dataset generalization risk. In this draft, small deltas (within $\pm$0.4 AUC or $\pm$0.5 CIDEr) should be interpreted as directional rather than conclusive.
@@ -737,6 +721,22 @@ After server-side multi-seed execution, we auto-render camera-ready table blocks
 40\% & 38.4 & 88.9 \\
 60\% & 29.0 & 88.8 \\
 100\% & 18.9 & 88.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{\textbf{Robustness to Runtime Protocol Variations.} Event-VLM-Core retains near-baseline quality across resolution and generation-length changes.}
+\label{tab:runtime_robustness}
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c|c|cc}
+\toprule
+\textbf{Resolution} & \textbf{Max Gen Len} & \textbf{CIDEr Retention} & \textbf{FPS Gain} \\
+\midrule
+224px & 128 & 99.2\% (88.3/89.0) & 9.07$\times$ (73.5/8.1) \\
+336px & 256 & 98.8\% (89.0/90.1) & 9.27$\times$ (48.2/5.2) \\
+448px & 384 & 98.5\% (89.2/90.6) & 8.52$\times$ (26.4/3.1) \\
 \bottomrule
 \end{tabular}
 \end{table}
