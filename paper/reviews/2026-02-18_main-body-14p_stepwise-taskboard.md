@@ -43,10 +43,11 @@
 - [x] T34: Regenerate Fig.2(a) source (`figure4_frontier.png`) with larger typography/labels at same page footprint.
 - [x] T35: Rebuild and verify warning/page-budget impact after T34.
 - [x] T36: If stable, create `v23` snapshot + changelog update.
-- [ ] T37: Final micro QA for submission bundle (`v23` PDF + version docs consistency) and capture only blockers.
+- [x] T37: Final micro QA for submission bundle (`v23` PDF + version docs consistency) and capture only blockers.
+- [ ] T38: Optional follow-up: raise Fig.3 inner-label readability (source-level simplification) without increasing footprint.
 
 ## Current Focus
-- T37 only: Final micro QA for submission bundle consistency.
+- T38 optional: Fig.3 inner-label readability polish (only if needed).
 
 ## T28 Audit Findings (No Edits)
 - Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
@@ -77,6 +78,11 @@
   - Build remains clean: overfull 0 / underfull hbox 0 / underfull vbox 0 / float-only-page warning 0.
   - Undefined refs/citations none; appendix start unchanged at page 19.
 - Post-T36 update: `v23` snapshot created (`paper/Event-VLM-paper-v23.pdf`) and version docs updated.
+- Post-T37 bundle QA:
+  - `paper/versions/CHANGELOG.md` includes `v23` entry and `paper/versions/README.md` lists `v23`.
+  - Snapshot files exist (`main.tex`, `main.bib`, `NOTES.md`, `Event-VLM-paper-v23.pdf`).
+  - Top-level and snapshot PDFs are byte-identical (`sha1`: `20cadf13975bb12b84f96cfe6aa8e3f21ee859bf`).
+  - No blocker found.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.
