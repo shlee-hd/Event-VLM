@@ -42,10 +42,11 @@
 - [x] T33: Visual QA pass on Fig.2(a)/Fig.3 readability in v22 PDF (zoomed check) and capture actionable notes only.
 - [x] T34: Regenerate Fig.2(a) source (`figure4_frontier.png`) with larger typography/labels at same page footprint.
 - [x] T35: Rebuild and verify warning/page-budget impact after T34.
-- [ ] T36: If stable, create `v23` snapshot + changelog update.
+- [x] T36: If stable, create `v23` snapshot + changelog update.
+- [ ] T37: Final micro QA for submission bundle (`v23` PDF + version docs consistency) and capture only blockers.
 
 ## Current Focus
-- T36 only: Create `v23` snapshot + changelog update.
+- T37 only: Final micro QA for submission bundle consistency.
 
 ## T28 Audit Findings (No Edits)
 - Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
@@ -75,6 +76,7 @@
   - Fig.2(a) source regenerated via `scripts/make_frontier_figure.py` with larger labels/legend/markers and higher raster DPI; print-size readability improved in zoomed page render.
   - Build remains clean: overfull 0 / underfull hbox 0 / underfull vbox 0 / float-only-page warning 0.
   - Undefined refs/citations none; appendix start unchanged at page 19.
+- Post-T36 update: `v23` snapshot created (`paper/Event-VLM-paper-v23.pdf`) and version docs updated.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.

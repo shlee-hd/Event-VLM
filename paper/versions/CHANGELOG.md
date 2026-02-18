@@ -1,5 +1,23 @@
 # Event-VLM Paper Changelog
 
+## v23 (2026-02-18)
+- Improved Fig.2(a) readability while preserving page footprint:
+  - regenerated `figure4_frontier.png` with larger axis/annotation/legend typography and larger markers,
+  - kept `fig:frontier` placement/width in `main.tex` unchanged.
+- Validation results after rebuild:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - underfull vbox: `0`
+  - float-only-page warning: `0`
+  - undefined references/citations: none
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v23/main.tex`
+  - `paper/versions/v23/main.bib`
+  - `paper/versions/v23/Event-VLM-paper-v23.pdf`
+  - `paper/Event-VLM-paper-v23.pdf`
+
 ## v22 (2026-02-18)
 - Applied table/figure footprint refinements after v21:
   - compacted `tab:quality_retention` style without changing reported values,
