@@ -3,6 +3,8 @@ SHELL := /bin/bash
 LATEXMK ?= latexmk
 PDFLATEX ?= pdflatex
 BIBTEX ?= bibtex
+TINYTEX_PDFTEX := ../../.texlive/TinyTeX/bin/universal-darwin/pdftex
+TINYTEX_BIBTEX := ../../.texlive/TinyTeX/bin/universal-darwin/bibtex
 MAIN := main.tex
 DOC := $(basename $(MAIN))
 OUTDIR := build
@@ -20,8 +22,17 @@ pdf: bootstrap-style
 		fi; \
 		$(PDFLATEX) -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
 		$(PDFLATEX) -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
+	elif [ -x "$(TINYTEX_PDFTEX)" ]; then \
+		$(TINYTEX_PDFTEX) -fmt=pdflatex -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
+		if command -v $(BIBTEX) >/dev/null 2>&1; then \
+			(cd $(OUTDIR) && BIBINPUTS=..: $(BIBTEX) $(DOC)) || true; \
+		elif [ -x "$(TINYTEX_BIBTEX)" ]; then \
+			(cd $(OUTDIR) && BIBINPUTS=..: ../../../.texlive/TinyTeX/bin/universal-darwin/bibtex $(DOC)) || true; \
+		fi; \
+		$(TINYTEX_PDFTEX) -fmt=pdflatex -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
+		$(TINYTEX_PDFTEX) -fmt=pdflatex -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
 	else \
-		echo "Neither latexmk nor pdflatex is available in PATH."; \
+		echo "No usable LaTeX engine found (latexmk/pdflatex/TinyTeX pdftex)."; \
 		exit 1; \
 	fi
 

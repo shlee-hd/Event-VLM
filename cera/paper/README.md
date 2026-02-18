@@ -18,6 +18,8 @@ make pdf
 - Otherwise, it copies them from `paper/` if available.
 - Build output is generated in `cera/paper/build/`.
 - Build engine preference: `latexmk` first, then `pdflatex` fallback.
+- If neither is in PATH, it falls back to TinyTeX `pdftex -fmt=pdflatex` when available.
+- Current figure source is linked via `cera/paper/figures -> ../../paper/figures`.
 
 ## Naming conventions
 

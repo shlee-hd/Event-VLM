@@ -17,4 +17,4 @@ Keep frozen manuscript snapshots for CERA iterations independent of the legacy `
 ## Current state
 
 - `v1`: initial CERA seed derived from the latest Event-VLM manuscript and naming migration.
-- `v2`: CER-first terminology pass + standalone CERA paper build workflow (`Makefile`).
+- `v2`: CER-first terminology pass + standalone CERA paper build workflow (`Makefile`) + compiled snapshot (`CERA-paper-v2.pdf`).

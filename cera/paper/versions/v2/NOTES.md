@@ -15,6 +15,8 @@
   - `cera/paper/Makefile` with style bootstrap + engine fallback logic
   - `cera/paper/.gitignore`
   - updated `cera/paper/README.md` build instructions
+- Compiled snapshot artifact:
+  - `cera/paper/versions/v2/CERA-paper-v2.pdf` (26 pages)
 
 ## Intent
 
