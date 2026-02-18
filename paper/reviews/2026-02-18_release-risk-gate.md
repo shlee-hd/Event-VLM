@@ -1,15 +1,15 @@
-# Release & Risk Gate (2026-02-18, v13 refresh)
+# Release & Risk Gate (2026-02-18)
 
-Status: IN_PROGRESS (server-unavailable mode)
+Status: IN_PROGRESS (updated after v9 figure audit)
 Owner: Release & Risk Team
 
 ## Objective
 - Define non-negotiable gate before promoting next paper version.
 
 ## P0 Gate Items
-- [ ] headline claims tied to reproducible artifacts. (BLOCKED by server)
-- [x] reviewer P0 findings resolved. (compile crash fixed)
-- [x] no equation-interpretation ambiguity in method core. (v13 notation patch applied)
+- [ ] headline claims tied to reproducible artifacts.
+- [ ] reviewer P0 findings resolved.
+- [ ] no equation-interpretation ambiguity in method core.
 
 ## P1 Gate Items
 - [ ] benchmark fairness wording consistent across main and appendix.
@@ -19,15 +19,11 @@ Owner: Release & Risk Team
 ## Current Risk Register
 | Risk ID | Severity | Description | Owner | Mitigation Status |
 |---|---|---|---|---|
-| R1 | P0 | multi-seed CI/significance not integrated in main tables yet | Experiment + Reviewer | OPEN (server blocked) |
+| R1 | P0 | multi-seed CI/significance not integrated in main tables yet | Experiment + Reviewer | OPEN |
 | R2 | P1 | benchmark expansion not finalized | Data/Benchmark | OPEN |
 | R3 | P1 | final abstract wording may need CI-aware update | Writing | OPEN |
-| R4 | P0 | compile failure from sparse decoding equation (double subscript) | Method + Reviewer | CLOSED in v13 |
-| R5 | P1 | overfull/underfull layout warnings remain in log | Writing | OPEN |
+| R4 | P0 | figure clipping/semantic mismatch from v8 visuals | Writing + Reviewer | CLOSED in v9 |
 
 ## Go/No-Go Rule
-- No-go if any P0 remains OPEN (or BLOCKED without owner/date).
-- Conditional go only when:
-  - measured artifacts are generated and linked,
-  - all P0 are CLOSED,
-  - remaining P1 items have committed owner/date.
+- No-go if any P0 remains OPEN.
+- Conditional go if only P1 remains and mitigation date is committed.
