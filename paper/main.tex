@@ -62,7 +62,7 @@ Real-time surveillance VLM deployment is constrained by inference economics: pra
 \section{Introduction}
 
 \paragraph{The Paradigm Shift.}
-Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal families now provide grounded explanation capability across open-domain scenes~\cite{llava,llava15,llavanext,blip2,instructblip}. Additional multimodal assistants reinforce the same trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this distinction is operationally critical: causal accident explanation enables immediate response prioritization.
+Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal models now provide grounded explanations across open-domain scenes~\cite{llava,llava15,llavanext,blip2,instructblip}. Additional multimodal assistants reinforce this trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this shift is operationally critical: causal accident explanation enables immediate response prioritization.
 
 \paragraph{The Scalability Bottleneck.}
 Deploying these models in surveillance remains hard. Video-oriented VLM systems improve temporal reasoning~\cite{videollama,videochat,videollava,video_chatgpt,moviechat,timechat,vila}. Temporal backbones also continue to advance video understanding~\cite{timesformer,slowfast,i3d}. Real-time multi-stream deployment, however, is still constrained by compute and memory. Unlike offline analysis, surveillance requires persistent online inference over many cameras. We identify three orthogonal axes of computational redundancy that drive this bottleneck (Fig.~\ref{fig:framework}):
