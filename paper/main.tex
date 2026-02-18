@@ -536,27 +536,8 @@ We compute stream capacity at 1 FPS input per stream as:
 where $L_{e2e}^{ms}$ is end-to-end latency per processed frame in milliseconds.
 
 \subsubsection{Event-Density Stress Test.}
-\begin{table}[t]
-\caption{\textbf{Stress Test Under Varying Event Density.} Effective throughput of Event-VLM-Core under controlled trigger rates (synthetic replay protocol).}
-\label{tab:event_density}
-\centering
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{c|cc}
-\toprule
-\textbf{Triggered Frame Ratio} & \textbf{Effective FPS} & \textbf{CIDEr} \\
-\midrule
-5\% & 93.4 & 89.0 \\
-10\% & 79.1 & 89.0 \\
-20\% & 61.0 & 89.0 \\
-40\% & 38.4 & 88.9 \\
-60\% & 29.0 & 88.8 \\
-100\% & 18.9 & 88.7 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-As event density increases, throughput degrades gracefully rather than collapsing (Table~\ref{tab:event_density}). Even in the worst-case 100\% trigger setting, Event-VLM-Core remains substantially faster than the full-frame baseline while preserving caption quality.
-This table is an internal scaling analysis of Event-VLM-Core under controlled trigger load, rather than a cross-method fairness benchmark, and is not used for headline SOTA claims.
+As event density increases, throughput degrades gracefully rather than collapsing (Appendix Table~\ref{tab:event_density}). Even in the worst-case 100\% trigger setting, Event-VLM-Core remains substantially faster than the full-frame baseline while preserving caption quality.
+This internal scaling table is moved to the appendix to keep the main narrative focused on headline comparisons.
 
 \subsubsection{Protocol Robustness Across Resolution and Decode Length.}
 \begin{table}[t]
@@ -737,6 +718,25 @@ After server-side multi-seed execution, we auto-render camera-ready table blocks
 + Spatial pruning & +20.0 & -0.2 & -0.9 \\
 + Decoding sparsity & +9.7 & +0.0 & -0.2 \\
 + Prompt adaptation & -0.2 & +0.8 & +0.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{\textbf{Stress Test Under Varying Event Density.} Effective throughput of Event-VLM-Core under controlled trigger rates (synthetic replay protocol).}
+\label{tab:event_density}
+\centering
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{c|cc}
+\toprule
+\textbf{Triggered Frame Ratio} & \textbf{Effective FPS} & \textbf{CIDEr} \\
+\midrule
+5\% & 93.4 & 89.0 \\
+10\% & 79.1 & 89.0 \\
+20\% & 61.0 & 89.0 \\
+40\% & 38.4 & 88.9 \\
+60\% & 29.0 & 88.8 \\
+100\% & 18.9 & 88.7 \\
 \bottomrule
 \end{tabular}
 \end{table}
