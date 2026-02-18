@@ -1,21 +1,5 @@
 # Event-VLM Paper Changelog
 
-## v14 (2026-02-18)
-- Captured a new paper snapshot after non-experiment remediation and command-center preparation.
-- Manuscript-level updates:
-  - fixed sparse decoding equation compile blocker (double-subscript issue),
-  - added explicit figure/table references to tighten claim-to-evidence mapping in main narrative,
-  - clarified method notation (`\sigma_{\text{shape}}`, top-k index operator, threshold relation),
-  - added draft limitations paragraph for projected-number scope control.
-- Added coordination/command readiness artifacts for server-unavailable mode:
-  - team command board and cross-team command center memo,
-  - server restore ready-to-run packet and queue/log status refresh.
-- Snapshot artifacts:
-  - `paper/versions/v14/main.tex`
-  - `paper/versions/v14/main.bib`
-  - `paper/versions/v14/Event-VLM-paper-v14.pdf`
-  - `paper/Event-VLM-paper-v14.pdf`
-
 ## v13 (2026-02-18)
 - Added automated paper-table rendering stage to close the last manual gap between server experiments and manuscript updates:
   - new renderer script: `scripts/render_paper_updates.py`,
