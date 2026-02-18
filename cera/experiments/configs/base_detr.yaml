@@ -1,0 +1,13 @@
+# CERA DETR detector override configuration
+
+defaults:
+  - base
+
+detector:
+  model: "detr-r50"
+  profile: "global_matching"
+  conf_threshold: 0.45
+  iou_threshold: 0.5
+
+control:
+  latency_budget_ms: 150

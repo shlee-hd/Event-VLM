@@ -6,7 +6,8 @@ defaults:
 
 # Detector configuration (Stage 1)
 detector:
-  model: "yolov8n"  # reference: lightweight real-time detector
+  model: "yolov8n"  # options: yolov8n (realtime), detr-r50 (global matching)
+  profile: "realtime"
   pretrained: true
   conf_threshold: 0.5
   iou_threshold: 0.45
