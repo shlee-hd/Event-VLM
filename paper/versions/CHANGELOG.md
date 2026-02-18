@@ -1,5 +1,23 @@
 # Event-VLM Paper Changelog
 
+## v22 (2026-02-18)
+- Applied table/figure footprint refinements after v21:
+  - compacted `tab:quality_retention` style without changing reported values,
+  - tuned Fig.3 (`fig:component_breakdown`) to `width=0.95\textwidth` with `[!b]` float placement.
+- Validation results after rebuild:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - underfull vbox: `0`
+  - float-only-page warning: `0`
+  - undefined references/citations: none
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v22/main.tex`
+  - `paper/versions/v22/main.bib`
+  - `paper/versions/v22/Event-VLM-paper-v22.pdf`
+  - `paper/Event-VLM-paper-v22.pdf`
+
 ## v21 (2026-02-18)
 - Increased `fig:frontier` display width from `0.96\textwidth` to `\textwidth` to improve in-paper readability of the speed-quality plot.
 - Kept prior float-placement stabilization (`[!b]`) unchanged.
