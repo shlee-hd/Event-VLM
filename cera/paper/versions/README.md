@@ -25,3 +25,4 @@ Version history for the clean-room CERA manuscript.
 - `v8`: CERA-Ref concretization (reference stack, optimization, inference procedure, ablations), with compiled snapshot `CERA-paper-v8.pdf`.
 - `v9`: DETR detector option integration (method + configs), with compiled snapshot `CERA-paper-v9.pdf`.
 - `v10`: experiments protocol hardening (annotations, baselines, metric formulas, reproducibility/statistics), with compiled snapshot `CERA-paper-v10.pdf`.
+- `v11`: validator/status-policy formalization and status safety metrics (`R_valid`, `R_unsafe`), with compiled snapshot `CERA-paper-v11.pdf`.
