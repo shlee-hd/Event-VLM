@@ -21,10 +21,10 @@
 - [x] T12: Remove overfull line at `paper/main.tex:543` (runtime-robustness appendix-reference sentence).
 - [x] T13: Reduce appendix traceability-table underfull warnings by tightening row labels at `paper/main.tex:630`.
 - [x] T14: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
-- [ ] T15: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
+- [x] T15: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
 
 ## Current Focus
-- T15 only: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
+- Completed through T15. Next optional micro-task is residual warning polish (`paper/main.tex:84`, `paper/main.tex:827`) only if desired.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.

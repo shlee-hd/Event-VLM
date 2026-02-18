@@ -1,5 +1,28 @@
 # Event-VLM Paper Changelog
 
+## v17 (2026-02-18)
+- Completed post-v16 stabilization micro-tasks (`T09`--`T14`) tracked in:
+  - `paper/reviews/2026-02-18_main-body-14p_stepwise-taskboard.md`
+- Applied targeted wording/layout trims to reduce log noise without changing evidence scope:
+  - intro wording split (`paper/main.tex:65`),
+  - related-work sentence compression (`paper/main.tex:104`, `paper/main.tex:112`, `paper/main.tex:115`),
+  - XD-Violence summary sentence trim (`paper/main.tex:421`),
+  - runtime-robustness appendix-reference sentence trim (`paper/main.tex:543`),
+  - claim-traceability table row-label tightening (`paper/main.tex:630`).
+- Warning delta (baseline at T09 start -> v17):
+  - overfull hbox: `7 -> 1` (remaining minor `0.32753pt` at `paper/main.tex:84`),
+  - underfull hbox: `5 -> 1` (remaining at `paper/main.tex:827`),
+  - underfull vbox: `1 -> 1` (float-page output routine).
+- Verification:
+  - PASS: `bash scripts/build_paper.sh`
+  - no undefined references/citations in `paper/build/main.log`
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v17/main.tex`
+  - `paper/versions/v17/main.bib`
+  - `paper/versions/v17/Event-VLM-paper-v17.pdf`
+  - `paper/Event-VLM-paper-v17.pdf`
+
 ## v16 (2026-02-18)
 - Performed stepwise page-budget refinement with micro-task tracking (`paper/reviews/2026-02-18_main-body-14p_stepwise-taskboard.md`).
 - Figure/layout updates:

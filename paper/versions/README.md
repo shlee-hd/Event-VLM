@@ -25,3 +25,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v14`: claim-conservative wording polish and reviewer-fairness hardening snapshot (`paper/versions/v14/`)
 - `v15`: Figure 3/4 horizontal subfigure merge for page-efficiency (`paper/versions/v15/`)
 - `v16`: stepwise main-body page-budget pass (14p target) with figure/table relocation (`paper/versions/v16/`)
+- `v17`: post-v16 warning-stabilization pass with micro wording/table-label cleanup (`paper/versions/v17/`)
