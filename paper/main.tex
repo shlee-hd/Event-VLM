@@ -711,6 +711,38 @@ Robust scaling under shifts & Tables~\ref{tab:latency_stream}, \ref{tab:event_de
     \item \textbf{Reporting Policy}: claims of ``quality-preserving'' speedup in the camera-ready version will be tied to confidence intervals, not only point estimates.
 \end{itemize}
 
+\subsection{Auto-Generated Statistical Tables}
+After server-side multi-seed execution, we auto-render camera-ready table blocks from experiment artifacts (`summary.json` and significance outputs) to reduce manual transcription error.
+\IfFileExists{generated/table_multiseed_overview.tex}{
+  \input{generated/table_multiseed_overview.tex}
+}{
+  \begin{table}[ht]
+  \centering
+  \caption{Placeholder for auto-generated multi-seed overview table.}
+  \label{tab:auto_multiseed_overview_placeholder}
+  \begin{tabular}{l}
+  \toprule
+  Pending server execution: `paper/generated/table\_multiseed\_overview.tex` \\
+  \bottomrule
+  \end{tabular}
+  \end{table}
+}
+
+\IfFileExists{generated/table_significance_summary.tex}{
+  \input{generated/table_significance_summary.tex}
+}{
+  \begin{table}[ht]
+  \centering
+  \caption{Placeholder for auto-generated paired significance summary table.}
+  \label{tab:auto_significance_summary_placeholder}
+  \begin{tabular}{l}
+  \toprule
+  Pending server execution: `paper/generated/table\_significance\_summary.tex` \\
+  \bottomrule
+  \end{tabular}
+  \end{table}
+}
+
 
 \section{Additional Ablation Studies}
 \label{sec:add_ablations}

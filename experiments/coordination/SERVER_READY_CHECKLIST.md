@@ -26,6 +26,8 @@ Use this checklist on the first day when experiment infrastructure becomes acces
 - [ ] run IDs and ETA recorded in `RUN_LOG.md`.
 - [ ] artifacts registered in `ARTIFACT_REGISTRY.md`.
 - [ ] paired significance scripts executed (`none vs core/full`).
+- [ ] `paper/generated/table_multiseed_overview.tex` rendered.
+- [ ] `paper/generated/table_significance_summary.tex` rendered.
 
 ## E. Sync Back to Main Workspace
 - [ ] key outputs copied or pushed.

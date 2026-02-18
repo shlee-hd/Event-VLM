@@ -1,5 +1,24 @@
 # Event-VLM Paper Changelog
 
+## v13 (2026-02-18)
+- Added automated paper-table rendering stage to close the last manual gap between server experiments and manuscript updates:
+  - new renderer script: `scripts/render_paper_updates.py`,
+  - generated outputs: `paper/generated/table_multiseed_overview.tex` and `paper/generated/table_significance_summary.tex`.
+- Extended experiment entry scripts to invoke renderer after multi-seed/significance phases:
+  - `scripts/server_ready_one_click.sh` (default `RENDER_PAPER_TABLES=1`),
+  - `scripts/run_experiments.sh` (new `--render-paper` and `--paper-table-dir` flags).
+- Added appendix hooks in `paper/main.tex`:
+  - `\\IfFileExists`-based inclusion of generated statistical tables with safe placeholders when artifacts are not yet available.
+- Updated execution/reviewer docs to include generated-table handoff flow:
+  - `experiments/coordination/README.md`
+  - `experiments/coordination/SERVER_READY_CHECKLIST.md`
+  - `paper/reviews/2026-02-18_benchmark-expansion-plan.md`
+- Snapshot artifacts:
+  - `paper/versions/v13/main.tex`
+  - `paper/versions/v13/main.bib`
+  - `paper/versions/v13/Event-VLM-paper-v13.pdf`
+  - `paper/Event-VLM-paper-v13.pdf`
+
 ## v12 (2026-02-18)
 - Added ready-to-run benchmark/statistical expansion infrastructure (non-execution phase):
   - new third-benchmark config template: `experiments/configs/shanghaitech.yaml`,

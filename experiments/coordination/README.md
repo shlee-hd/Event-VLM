@@ -14,6 +14,7 @@ This directory is the canonical handoff and synchronization hub for external exe
 - `bash scripts/server_ready_one_click.sh`
 - Extended example (three benchmarks + significance):
   - `BENCHMARK_CONFIGS=experiments/configs/ucf_crime.yaml,experiments/configs/xd_violence.yaml,experiments/configs/shanghaitech.yaml VARIANTS=none,core,full SIGNIFICANCE=1 SIGNIFICANCE_BASELINE=none SIGNIFICANCE_CANDIDATES=core,full bash scripts/server_ready_one_click.sh`
+  - This also renders paper-ready LaTeX blocks to `paper/generated/` by default (`RENDER_PAPER_TABLES=1`).
 
 ## Rules
 - Every run must be logged.

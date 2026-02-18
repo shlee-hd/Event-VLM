@@ -17,6 +17,8 @@ QUICK_MODE="${QUICK_MODE:-0}"
 SIGNIFICANCE="${SIGNIFICANCE:-0}"
 SIGNIFICANCE_BASELINE="${SIGNIFICANCE_BASELINE:-none}"
 SIGNIFICANCE_CANDIDATES="${SIGNIFICANCE_CANDIDATES:-core,full}"
+RENDER_PAPER_TABLES="${RENDER_PAPER_TABLES:-1}"
+PAPER_TABLE_DIR="${PAPER_TABLE_DIR:-$ROOT_DIR/paper/generated}"
 
 IFS=',' read -r -a CONFIG_ARRAY <<< "$BENCHMARK_CONFIGS"
 IFS=',' read -r -a SIGNIFICANCE_CANDIDATE_ARRAY <<< "$SIGNIFICANCE_CANDIDATES"
@@ -37,6 +39,7 @@ echo "Detector:   $DETECTOR"
 echo "Device:     $DEVICE"
 echo "Configs:    $BENCHMARK_CONFIGS"
 echo "Signif.:    $SIGNIFICANCE (baseline=$SIGNIFICANCE_BASELINE, candidates=$SIGNIFICANCE_CANDIDATES)"
+echo "RenderTex:  $RENDER_PAPER_TABLES (out=$PAPER_TABLE_DIR)"
 echo "Output:     $OUTPUT_DIR"
 echo "=================================================="
 
@@ -97,6 +100,33 @@ if [ "$SIGNIFICANCE" = "1" ]; then
   done
 fi
 
+if [ "$RENDER_PAPER_TABLES" = "1" ]; then
+  DATASETS_CSV=""
+  for cfg in "${CONFIG_ARRAY[@]}"; do
+    dataset="$(basename "$cfg" .yaml)"
+    if [ -z "$DATASETS_CSV" ]; then
+      DATASETS_CSV="$dataset"
+    else
+      DATASETS_CSV="$DATASETS_CSV,$dataset"
+    fi
+  done
+
+  RENDER_CMD=(
+    python scripts/render_paper_updates.py
+    --multi-seed-root "$OUTPUT_DIR"
+    --output-dir "$PAPER_TABLE_DIR"
+    --datasets "$DATASETS_CSV"
+    --baseline "$SIGNIFICANCE_BASELINE"
+    --candidates "$SIGNIFICANCE_CANDIDATES"
+  )
+  echo "Running render: ${RENDER_CMD[*]}"
+  "${RENDER_CMD[@]}"
+fi
+
 echo "Done. Outputs:"
 echo "- $OUTPUT_DIR/summary.json"
 echo "- $OUTPUT_DIR/summary.md"
+if [ "$RENDER_PAPER_TABLES" = "1" ]; then
+  echo "- $PAPER_TABLE_DIR/table_multiseed_overview.tex"
+  echo "- $PAPER_TABLE_DIR/table_significance_summary.tex"
+fi

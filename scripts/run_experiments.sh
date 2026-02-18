@@ -17,6 +17,8 @@ CONFIGS_CSV="experiments/configs/ucf_crime.yaml,experiments/configs/xd_violence.
 SIGNIFICANCE=""
 SIGNIFICANCE_BASELINE="none"
 SIGNIFICANCE_CANDIDATES="core,full"
+RENDER_PAPER=""
+PAPER_TABLE_DIR="paper/generated"
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
@@ -30,6 +32,8 @@ while [[ "$#" -gt 0 ]]; do
     --significance) SIGNIFICANCE="true" ;;
     --significance-baseline) SIGNIFICANCE_BASELINE="$2"; shift ;;
     --significance-candidates) SIGNIFICANCE_CANDIDATES="$2"; shift ;;
+    --render-paper) RENDER_PAPER="true" ;;
+    --paper-table-dir) PAPER_TABLE_DIR="$2"; shift ;;
     *) echo "Unknown parameter: $1"; exit 1 ;;
   esac
   shift
@@ -52,6 +56,9 @@ echo "Variants: $VARIANTS"
 echo "Configs: $CONFIGS_CSV"
 if [[ "$SIGNIFICANCE" == "true" ]]; then
   echo "Significance: enabled (baseline=$SIGNIFICANCE_BASELINE, candidates=$SIGNIFICANCE_CANDIDATES)"
+fi
+if [[ "$RENDER_PAPER" == "true" ]]; then
+  echo "Render paper tables: enabled (out=$PAPER_TABLE_DIR)"
 fi
 if [[ "$MULTI_SEED" == "true" ]]; then
   echo "Multi-seed: enabled (seeds=$SEEDS)"
@@ -119,6 +126,25 @@ if [[ "$MULTI_SEED" == "true" ]]; then
           --seeds "$SEEDS"
       done
     done
+  fi
+
+  if [[ "$RENDER_PAPER" == "true" ]]; then
+    DATASETS_CSV=""
+    for cfg in "${CONFIGS[@]}"; do
+      dataset="$(basename "$cfg" .yaml)"
+      if [[ -z "$DATASETS_CSV" ]]; then
+        DATASETS_CSV="$dataset"
+      else
+        DATASETS_CSV="$DATASETS_CSV,$dataset"
+      fi
+    done
+
+    python scripts/render_paper_updates.py \
+      --multi-seed-root "$OUTPUT_DIR/multi_seed" \
+      --output-dir "$PAPER_TABLE_DIR" \
+      --datasets "$DATASETS_CSV" \
+      --baseline "$SIGNIFICANCE_BASELINE" \
+      --candidates "$SIGNIFICANCE_CANDIDATES"
   fi
 fi
 

@@ -23,7 +23,8 @@ Owner: Data & Benchmark Team
 1. Run multi-seed on three datasets (`ucf_crime`, `xd_violence`, `shanghaitech`) with variants `none,core,full`.
 2. Generate CI summary using `experiments/multi_seed_eval.py`.
 3. Run paired significance per dataset (`none vs core`, `none vs full`) using `experiments/paired_significance.py`.
-4. Sync outputs into coordination artifacts and update manuscript tables.
+4. Auto-render manuscript table blocks via `scripts/render_paper_updates.py` into `paper/generated/`.
+5. Sync outputs into coordination artifacts and update manuscript text around the generated tables.
 
 ## Baseline Parity Audit
 - [ ] reproduced baselines list finalized.
