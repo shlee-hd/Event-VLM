@@ -54,7 +54,7 @@
 \begin{abstract}
 Real-time surveillance event reasoning is constrained by inference economics: practical systems must process many concurrent streams while preserving explanation quality and causal attribution fidelity. We identify three orthogonal redundancy axes that dominate runtime cost: \textit{temporal} redundancy (most frames are non-events), \textit{spatial} redundancy (most visual tokens are background), and \textit{decoding} redundancy (auto-regressive KV-cache access is memory-bandwidth bound). We present \textbf{CERA} (\textbf{C}ausal \textbf{E}vent \textbf{R}easoning and \textbf{A}ttribution), a tri-axis compute-allocation framework that decides computation \textit{when} events occur, \textit{where} hazards exist, and \textit{which} cache entries matter for generation. CERA integrates: (1) \textit{Event-Triggered Gating} with risk-sensitive detector training; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards; and (3) \textit{Frequency-Aware Sparse Decoding} that uses dominant RoPE frequency chunks as a training-free proxy for online token saliency. A lightweight hazard-priority prompting stage improves safety-specific description quality with minimal latency overhead. In pilot single-seed runs on UCF-Crime and XD-Violence, CERA reaches \textbf{48.2/48.0 FPS} (Core/Full) while retaining \textbf{98.8--99.4\% CIDEr} relative to a strong multimodal baseline (LLaVA-1.5). It also maintains gains above \textbf{8.5$\times$} in internal runtime stress tests. This draft reports deterministic pilot runs; multi-seed confidence intervals and paired significance tests are scheduled for the final statistical release.
 
-\keywords{Vision-Language Models, Efficient Inference, Surveillance, Token Pruning, KV Cache Optimization, Sparse Attention}
+\keywords{Multimodal Reasoning, Efficient Inference, Surveillance, Token Pruning, KV Cache Optimization, Sparse Attention}
 \end{abstract}
 
 
@@ -68,9 +68,9 @@ Recent VLMs shift visual understanding from recognition to explanation. Instruct
 Deploying these models in surveillance remains hard. Video-oriented VLM systems improve temporal reasoning~\cite{videollama,videochat,videollava,video_chatgpt,moviechat,timechat,vila}. Temporal backbones also continue to advance video understanding~\cite{timesformer,slowfast,i3d}. Real-time multi-stream deployment, however, is still constrained by compute and memory. Unlike offline analysis, surveillance requires persistent online inference over many cameras. We identify three orthogonal axes of computational redundancy that drive this bottleneck (Fig.~\ref{fig:framework}):
 
 \begin{itemize}
-    \item \textbf{Temporal Redundancy}: In typical surveillance footage, critical events occupy less than 1\% of the total duration. Processing every frame with a heavy VLM is wasteful.
+    \item \textbf{Temporal Redundancy}: In typical surveillance footage, critical events occupy less than 1\% of the total duration. Processing every frame with a heavy multimodal reasoner is wasteful.
     \item \textbf{Spatial Redundancy}: In a typical CCTV view, the vast majority of visual tokens (walls, sky, empty roads) are semantically irrelevant to any safety event. Feeding these tokens into costly self-attention layers is a significant waste.
-    \item \textbf{Decoding Redundancy}: During auto-regressive text generation, the Key-Value (KV) cache grows linearly with context length. At each decoding step, the model must access the \textit{entire} cache, creating a memory-bandwidth bottleneck that underutilizes modern GPUs~\cite{flash_attention}. This is particularly acute in VLMs, where hundreds of visual tokens inflate the KV cache.
+    \item \textbf{Decoding Redundancy}: During auto-regressive text generation, the Key-Value (KV) cache grows linearly with context length. At each decoding step, the model must access the \textit{entire} cache, creating a memory-bandwidth bottleneck that underutilizes modern GPUs~\cite{flash_attention}. This is particularly acute in large multimodal stacks, where hundreds of visual tokens inflate the KV cache.
 \end{itemize}
 
 \paragraph{Limitations of Existing Work.}
@@ -81,10 +81,10 @@ We propose \textbf{CERA}, a cascaded framework for \textbf{causal event reasonin
 \begin{enumerate}
     \item \textbf{Event-Triggered Gating} (Temporal) uses a lightweight detector with \textit{risk-sensitive loss} to suppress background frames while preserving recall on critical hazards.
     \item \textbf{Knowledge-Guided Token Pruning} (Spatial) converts detector priors into dynamic token masks, with \textit{adaptive dilation} for amorphous hazards such as fire and smoke.
-    \item \textbf{Frequency-Aware Sparse Decoding} (Decoding) adapts RoPE chunk-level sparsity~\cite{fasa} to VLM decoding, enabling training-free token saliency estimation and focused KV access during generation.
+    \item \textbf{Frequency-Aware Sparse Decoding} (Decoding) adapts RoPE chunk-level sparsity~\cite{fasa} to multimodal decoding, enabling training-free token saliency estimation and focused KV access during generation.
 \end{enumerate}
 
-These three stages are \textbf{training-free} with respect to the VLM backbone, requiring no backbone modification or full-model fine-tuning. We additionally include an optional, lightweight prompting module for domain adaptation.
+These three stages are \textbf{training-free} with respect to the multimodal backbone, requiring no backbone modification or full-model fine-tuning. We additionally include an optional, lightweight prompting module for domain adaptation.
 
 \paragraph{Contributions.}
 \begin{itemize}
@@ -155,7 +155,7 @@ Holmes-VAD~\cite{holmes_vad} & CVPR'25 & - & - & - & - & \checkmark \\
   (1) \textbf{Temporal}: Event-Triggered Gating filters background frames.
   (2) \textbf{Spatial}: Knowledge-Guided Token Pruning removes irrelevant visual tokens.
   (3) \textbf{Decoding}: Frequency-Aware Sparse Decoding optimizes KV cache access during generation.
-  (4) \textbf{Adaptation}: Hazard-Priority Prompting tailors the VLM to safety-critical reasoning.}
+  (4) \textbf{Adaptation}: Hazard-Priority Prompting tailors multimodal reasoning to safety-critical contexts.}
   \label{fig:framework}
 \end{figure}
 
@@ -166,7 +166,7 @@ As illustrated in Fig.~\ref{fig:framework}, \textbf{CERA} operates as a cascaded
     \item \textit{Event-Triggered Gating} ($\mathcal{F}_{gate}$) filters out background frames (\textbf{temporal});
     \item \textit{Knowledge-Guided Token Pruning} ($\mathcal{F}_{prune}$) reduces visual tokens via detection priors (\textbf{spatial});
     \item \textit{Frequency-Aware Sparse Decoding} ($\mathcal{F}_{sparse}$) optimizes KV cache access during generation (\textbf{decoding});
-    \item \textit{Hazard-Priority Prompting} ($\mathcal{P}_{ctx}$) adapts VLM reasoning to safety domains (\textbf{adaptation}).
+    \item \textit{Hazard-Priority Prompting} ($\mathcal{P}_{ctx}$) adapts multimodal reasoning to safety domains (\textbf{adaptation}).
 \end{enumerate}
 The overall inference for a frame $\mathbf{X}_t$ is:
 \begin{equation}
@@ -176,7 +176,7 @@ where $\mathcal{B}_t$ are detected bounding boxes and $\mathcal{P}_{ctx}$ are le
 
 
 \subsection{Stage 1: Event-Triggered Gating (Temporal Axis)}
-Processing every frame with a VLM is computationally redundant. We use a lightweight detector (YOLOv8-Nano) as a \textit{Trigger Module}.
+Processing every frame with a large multimodal model is computationally redundant. We use a lightweight detector (YOLOv8-Nano) as a \textit{Trigger Module}.
 For frame $\mathbf{X}_t$, the detector predicts bounding boxes $\mathcal{B}_t = \{b_1, \dots, b_N\}$ with class scores $\mathcal{S}_t = \{s_1, \dots, s_N\}$. The binary gating function is:
 \begin{equation}
     \mathbb{I}_{event}(\mathbf{X}_t) = 
@@ -201,7 +201,7 @@ By setting $\lambda_{crit} > \lambda_{high} > 1$, we bias the detector toward hi
 
 
 \subsection{Stage 2: Knowledge-Guided Token Pruning (Spatial Axis)}
-Standard VLMs process all patch tokens regardless of semantic density. We prune background tokens using detection priors from Stage~1 in a training-free manner.
+Standard multimodal stacks process all patch tokens regardless of semantic density. We prune background tokens using detection priors from Stage~1 in a training-free manner.
 
 \subsubsection{Dynamic Mask Generation.}
 Let the ViT divide frame $\mathbf{X}_t \in \mathbb{R}^{H \times W \times 3}$ into $L = (H/P) \times (W/P)$ patch tokens $\mathbf{Z} = \{z_1, \dots, z_L\}$.
@@ -229,7 +229,7 @@ with length $L' \ll L$, reducing self-attention complexity from $\mathcal{O}(L^2
 \subsection{Stage 3: Frequency-Aware Sparse Decoding (Decoding Axis)}
 \label{sec:fasa_decoding}
 
-While Stages 1--2 reduce \textit{input-side} compute, auto-regressive generation can still dominate latency because each step reads a growing KV cache that includes visual tokens. We therefore introduce \textbf{Frequency-Aware Sparse Decoding}, a two-step strategy that adapts RoPE functional sparsity~\cite{fasa} to VLM decoding: (i) \textit{Token Importance Prediction} (TIP) in a compact frequency subspace, followed by (ii) \textit{Focused Attention Computation} (FAC) on a selected token subset.
+While Stages 1--2 reduce \textit{input-side} compute, auto-regressive generation can still dominate latency because each step reads a growing KV cache that includes visual tokens. We therefore introduce \textbf{Frequency-Aware Sparse Decoding}, a two-step strategy that adapts RoPE functional sparsity~\cite{fasa} to multimodal decoding: (i) \textit{Token Importance Prediction} (TIP) in a compact frequency subspace, followed by (ii) \textit{Focused Attention Computation} (FAC) on a selected token subset.
 
 \subsubsection{Background: Functional Sparsity in RoPE.}
 In RoPE-based models~\cite{rope} (e.g., LLaMA/Vicuna used in LLaVA), each $d$-dimensional query/key vector is partitioned into $d/2$ orthogonal 2D subspaces called \textit{frequency chunks} (FCs). Each FC $i$ rotates at angular frequency $\theta_i = B^{-2(i-1)/d}$.
@@ -288,7 +288,7 @@ Beyond efficiency, we include an optional adaptation module for domain-specific 
 \begin{equation}
     \mathcal{L} = - \sum_{j=1}^{|\mathbf{Y}|} \log P_{\theta}(y_j \mid y_{<j}, \hat{\mathbf{Z}}, \mathcal{P}_{ctx}),
 \end{equation}
-where $\theta$ are frozen VLM parameters. Only $\mathcal{P}_{ctx}$ is updated ($<$0.1\% parameters).
+where $\theta$ are frozen backbone parameters. Only $\mathcal{P}_{ctx}$ is updated ($<$0.1\% parameters).
 
 \subsubsection{Hazard-Priority Prompting.}
 Different hazards require different reasoning granularity. We dynamically select from a hierarchical prompt bank:
@@ -315,7 +315,7 @@ We evaluate on two large-scale video anomaly detection datasets:
 We enriched a subset ($\sim$500 clips) with manual dense captions for accident explanation evaluation, following~\cite{anomalygpt}. We report benchmark results on both datasets to verify that efficiency gains are not specific to a single scene distribution.
 
 \subsubsection{Implementation Details.}
-We use \textbf{YOLOv8-Nano} ($\sim$1ms/frame) as the trigger and frozen \textbf{LLaVA-1.5-7B}~\cite{llava} (CLIP-ViT-L/14-336px + Vicuna-7B) as the VLM backbone. The Vicuna-7B LLM uses RoPE, enabling our frequency-aware sparse decoding.
+We use \textbf{YOLOv8-Nano} ($\sim$1ms/frame) as the trigger and frozen \textbf{LLaVA-1.5-7B}~\cite{llava} (CLIP-ViT-L/14-336px + Vicuna-7B) as the multimodal backbone. The Vicuna-7B LLM uses RoPE, enabling our frequency-aware sparse decoding.
 For Stage~3, we calibrate dominant FCs using 32 samples from the training set with $F=16$ (25\% of $d/2=64$ FCs) and $N_{fac}=256$ tokens. The confidence threshold is $\tau_{conf}=0.5$ and dilation base is $\alpha_{base}=1.2$.
 All experiments are conducted on a single \textbf{NVIDIA RTX 5080 GPU} with batch size 1, FP16 inference, frame sampling rate 1 FPS, and maximum generation length 256 tokens.
 
@@ -557,7 +557,7 @@ Appendix Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial 
 
 % --- CONCLUSION ---
 \section{Conclusion}
-We introduced \textbf{CERA}, a tri-axis inference framework for scalable surveillance VLMs. The core idea is to allocate computation only when needed (temporal gating), where needed (spatial pruning), and to what matters during generation (frequency-aware sparse decoding). This yields a coherent systems design rather than a collection of isolated accelerations.
+We introduced \textbf{CERA}, a tri-axis inference framework for scalable surveillance multimodal reasoning. The core idea is to allocate computation only when needed (temporal gating), where needed (spatial pruning), and to what matters during generation (frequency-aware sparse decoding). This yields a coherent systems design rather than a collection of isolated accelerations.
 
 Our risk-sensitive trigger preserves safety recall, adaptive pruning keeps critical context under aggressive token reduction, and FC-based decoding reduces KV-bandwidth pressure without retraining the backbone.
 Under a unified runtime protocol in pilot runs, CERA-Core maximizes throughput (48.2 FPS), while CERA-Full recovers additional quality (AUC 85.6, CIDEr 89.5) with negligible overhead.
@@ -584,7 +584,7 @@ Our framework relies on the initial detector's performance; however, the risk-se
 \subsection{Network Architecture}
 \textbf{Trigger Module.} YOLOv8-Nano~\cite{yolo}: input 640$\times$640, CSPDarknet backbone (3.2M params), $\sim$1ms on RTX 5080.
 
-\textbf{VLM Backbone.} LLaVA-1.5-7B with CLIP-ViT-L/14-336px visual encoder (576 patches) and Vicuna-7B LLM backbone (RoPE, $d=4096$, 32 heads, $d/2=64$ FCs per head).
+\textbf{Multimodal Backbone.} LLaVA-1.5-7B with CLIP-ViT-L/14-336px visual encoder (576 patches) and Vicuna-7B LLM backbone (RoPE, $d=4096$, 32 heads, $d/2=64$ FCs per head).
 
 \subsection{Hazard Class Taxonomy}
 \begin{itemize}
