@@ -32,11 +32,11 @@
 - [x] T23: Rebuild and verify page-budget/refs unchanged after T22.
 - [x] T24: If stable, create `v20` snapshot + changelog update.
 - [x] T25: Increase `fig:frontier` display width (`0.96\textwidth` -> `\textwidth`) for readability and float-page stability.
-- [ ] T26: Rebuild and verify warning/page-budget impact of T25.
+- [x] T26: Rebuild and verify warning/page-budget impact of T25.
 - [ ] T27: If T25/T26 are stable, create `v21` snapshot + changelog update.
 
 ## Current Focus
-- T26 only: Rebuild and verify warning/page-budget impact of T25.
+- T27 only: Create `v21` snapshot + changelog update.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
@@ -45,6 +45,7 @@
 - Post-T19 update: overfull hbox 0, underfull hbox 0, underfull vbox 1.
 - Post-T21 final update: overfull hbox 0, underfull hbox 0, underfull vbox 1 (float-output boundary only).
 - Post-T23 update: underfull vbox persists but badness is reduced (4492 -> 1097) with `fig:frontier` placement tuned to `[!b]`; page-budget and references remain unchanged.
+- Post-T26 update: after widening `fig:frontier` to `\textwidth`, warnings remain stable (overfull 0 / underfull hbox 0 / underfull vbox 1), no undefined refs/citations, and appendix still starts at page 19.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.
