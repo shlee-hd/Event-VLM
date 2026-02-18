@@ -34,14 +34,21 @@
 - [x] T25: Increase `fig:frontier` display width (`0.96\textwidth` -> `\textwidth`) for readability and float-page stability.
 - [x] T26: Rebuild and verify warning/page-budget impact of T25.
 - [x] T27: If T25/T26 are stable, create `v21` snapshot + changelog update.
-- [ ] T28: Audit main-text tables for vertical whitespace inefficiency and list merge/appendix candidates (no edits).
+- [x] T28: Audit main-text tables for vertical whitespace inefficiency and list merge/appendix candidates (no edits).
 - [ ] T29: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
 - [ ] T30: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
 - [ ] T31: Rebuild and verify warning/page-budget impact after T29/T30.
 - [ ] T32: If stable, create `v22` snapshot + changelog update.
 
 ## Current Focus
-- T28 only: Audit main-text tables for vertical whitespace inefficiency and list candidates.
+- T29 only: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
+
+## T28 Audit Findings (No Edits)
+- Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
+- Candidate A (highest savings / lowest claim risk): move `tab:eval_protocol` (`paper/main.tex:331`) to appendix and keep a 1--2 sentence fairness summary in main text.
+- Candidate B (high savings / moderate claim risk): move `tab:latency_stream` (`paper/main.tex:515`) to appendix and keep the stream-capacity formula + one headline number in main text.
+- Candidate C (moderate savings / low risk): tighten vertical whitespace of `tab:quality_retention` (`paper/main.tex:425`) by reducing caption/body padding and converting to a compact table style.
+- Excluded for now (core evidence in main narrative): `tab:main_results`, `tab:main_results_xd`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:method_comparison`.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
