@@ -81,7 +81,7 @@ We propose \textbf{Event-VLM}, a cascaded framework built on a simple systems pr
 \begin{enumerate}
     \item \textbf{Event-Triggered Gating} (Temporal) uses a lightweight detector with \textit{risk-sensitive loss} to suppress background frames while preserving recall on critical hazards.
     \item \textbf{Knowledge-Guided Token Pruning} (Spatial) converts detector priors into dynamic token masks, with \textit{adaptive dilation} for amorphous hazards such as fire and smoke.
-    \item \textbf{Frequency-Aware Sparse Decoding} (Decoding) adapts RoPE frequency-chunk functional sparsity~\cite{fasa} to VLM decoding, enabling training-free token importance estimation and focused KV access during generation.
+    \item \textbf{Frequency-Aware Sparse Decoding} (Decoding) adapts RoPE chunk-level sparsity~\cite{fasa} to VLM decoding, enabling training-free token saliency estimation and focused KV access during generation.
 \end{enumerate}
 
 These three stages are \textbf{training-free} with respect to the VLM backbone, requiring no backbone modification or full-model fine-tuning. We additionally include an optional, lightweight prompting module for domain adaptation.
