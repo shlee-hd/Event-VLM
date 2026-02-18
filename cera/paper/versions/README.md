@@ -22,3 +22,4 @@ Version history for the clean-room CERA manuscript.
 - `v5`: first bibliography and citation grounding pass, with compiled snapshot `CERA-paper-v5.pdf`.
 - `v6`: failure taxonomy wording cleanup and Related Work expansion, with compiled snapshot `CERA-paper-v6.pdf`.
 - `v7`: module-level method design expansion and conclusion sync, with compiled snapshot `CERA-paper-v7.pdf`.
+- `v8`: CERA-Ref concretization (reference stack, optimization, inference procedure, ablations), with compiled snapshot `CERA-paper-v8.pdf`.

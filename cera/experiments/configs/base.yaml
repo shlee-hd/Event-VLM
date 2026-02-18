@@ -6,7 +6,7 @@ defaults:
 
 # Detector configuration (Stage 1)
 detector:
-  model: "detr-l"  # detr-l, yolov8s, yolov8n
+  model: "yolov8n"  # reference: lightweight real-time detector
   pretrained: true
   conf_threshold: 0.5
   iou_threshold: 0.45
@@ -55,6 +55,36 @@ vlm:
   temperature: 0.2
   do_sample: false
   prompt_strategy: "hazard_priority"
+
+# Attribution module configuration
+attribution:
+  relation_types:
+    - "causes"
+    - "enables"
+    - "escalates"
+    - "prevents"
+  max_tuples: 6
+  tuple_conf_threshold: 0.4
+
+# Evidence alignment configuration
+evidence:
+  support_threshold: 0.55
+  max_spans_per_tuple: 3
+  min_span_frames: 2
+
+# Budget-aware control (Stage 4)
+control:
+  latency_budget_ms: 120
+  abstain_conf_threshold: 0.45
+  kv_budget_ratio: 0.25
+  fallback_policy: "partial_report"
+
+# Decoding policy
+decoding:
+  mode: "budgeted_sparse"
+  tip_frequency_chunks: 16
+  fac_topk_ratio: 0.25
+  min_active_tokens: 64
 
 # Data configuration
 data:

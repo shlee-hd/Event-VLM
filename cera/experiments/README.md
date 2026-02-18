@@ -8,6 +8,12 @@ This folder stores CERA-specific experiment configuration seeds, isolated from l
 - `configs/ucf_crime.yaml`: UCF-Crime focused override seed
 - `configs/xd_violence.yaml`: XD-Violence focused override seed
 
+`base.yaml` currently encodes the CERA-Ref stack:
+- lightweight detector (`yolov8n`),
+- open-source VLM backbone (`llava-1.5-7b`),
+- detection-guided token compaction,
+- budgeted sparse decoding and runtime control.
+
 ## Usage
 
 Use existing evaluation scripts with explicit config path:
