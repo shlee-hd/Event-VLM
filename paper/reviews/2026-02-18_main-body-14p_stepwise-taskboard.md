@@ -6,7 +6,7 @@
 
 ## Micro Tasks
 - [x] T01: Fix Fig.3 aspect ratio source asset (`figure2_components.png`) to reduce vertical footprint.
-- [ ] T02: Fix Fig.2(a) readability by separating combined figure and restoring a readable standalone frontier figure.
+- [x] T02: Fix Fig.2(a) readability by separating combined figure and restoring a readable standalone frontier figure.
 - [ ] T03: Move `tab:axis_gain` from main text to appendix (keep references valid).
 - [ ] T04: Move `tab:event_density` from main text to appendix.
 - [ ] T05: Move `tab:runtime_robustness` from main text to appendix.
@@ -15,4 +15,4 @@
 - [ ] T08: Version snapshot + changelog update.
 
 ## Current Focus
-- T01 complete candidate: pending build verification + commit.
+- T03 only: move `tab:axis_gain` to appendix and rebuild.
