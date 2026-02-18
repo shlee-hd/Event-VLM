@@ -20,8 +20,14 @@
 - [x] T11: Remove overfull line at `paper/main.tex:421` (XD-Violence summary sentence).
 - [x] T12: Remove overfull line at `paper/main.tex:543` (runtime-robustness appendix-reference sentence).
 - [x] T13: Reduce appendix traceability-table underfull warnings by tightening row labels at `paper/main.tex:630`.
-- [ ] T14: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
+- [x] T14: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
 - [ ] T15: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
 
 ## Current Focus
-- T14 only: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
+- T15 only: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
+
+## T14 Warning Delta Report
+- Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
+- Current (after T14 rebuild): overfull hbox 1 (`paper/main.tex:84`, 0.32753pt), underfull hbox 1 (`paper/main.tex:827`, badness 1259), underfull vbox 1 (output routine around float page).
+- Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
+- Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
