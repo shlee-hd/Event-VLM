@@ -23,7 +23,7 @@ make pdf
 
 - Method name: `CERA`
 - Expansion: `Causal Event Reasoning and Attribution`
-- Internal shorthand: `CER`
+- Internal shorthand: `CER` (use for objective/component-level terms, not as the paper title)
 - Variants: `CERA-Core`, `CERA-Full`
 
 ## Migration checklist
