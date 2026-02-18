@@ -15,3 +15,4 @@ Version history for the clean-room CERA manuscript.
 ## Current state
 
 - `v0`: clean-room initialization from CERA keyword only, with compiled snapshot `CERA-paper-v0.pdf`.
+- `v1`: title and Introduction first draft, with compiled snapshot `CERA-paper-v1.pdf`.
