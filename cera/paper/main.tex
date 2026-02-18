@@ -36,7 +36,7 @@
 \begin{document}
 
 % ---------------------------------------------------------------
-\title{CERA: Tri-Axis Compute Allocation for Real-time Surveillance Video Understanding}
+\title{CERA: Causal Event Reasoning and Attribution via Tri-Axis Compute Allocation for Real-time Surveillance Video Understanding}
 
 \titlerunning{CERA}
 
@@ -52,7 +52,7 @@
 
 % --- ABSTRACT ---
 \begin{abstract}
-Real-time surveillance VLM deployment is constrained by inference economics: practical systems must process many concurrent streams while preserving explanation quality. We identify three orthogonal redundancy axes that dominate runtime cost: \textit{temporal} redundancy (most frames are non-events), \textit{spatial} redundancy (most visual tokens are background), and \textit{decoding} redundancy (auto-regressive KV-cache access is memory-bandwidth bound). We present \textbf{CERA} (\textbf{C}ausal \textbf{E}vent \textbf{R}easoning and \textbf{A}ttribution), a tri-axis compute-allocation framework that decides computation \textit{when} events occur, \textit{where} hazards exist, and \textit{which} cache entries matter for generation. CERA integrates: (1) \textit{Event-Triggered Gating} with risk-sensitive detector training; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards; and (3) \textit{Frequency-Aware Sparse Decoding} that uses dominant RoPE frequency chunks as a training-free proxy for online token saliency. A lightweight hazard-priority prompting stage improves safety-specific description quality with minimal latency overhead. In pilot single-seed runs on UCF-Crime and XD-Violence, CERA reaches \textbf{48.2/48.0 FPS} (Core/Full) while retaining \textbf{98.8--99.4\% CIDEr} relative to LLaVA-1.5. It also maintains gains above \textbf{8.5$\times$} in internal runtime stress tests. This draft reports deterministic pilot runs; multi-seed confidence intervals and paired significance tests are scheduled for the final statistical release.
+Real-time surveillance event reasoning is constrained by inference economics: practical systems must process many concurrent streams while preserving explanation quality and causal attribution fidelity. We identify three orthogonal redundancy axes that dominate runtime cost: \textit{temporal} redundancy (most frames are non-events), \textit{spatial} redundancy (most visual tokens are background), and \textit{decoding} redundancy (auto-regressive KV-cache access is memory-bandwidth bound). We present \textbf{CERA} (\textbf{C}ausal \textbf{E}vent \textbf{R}easoning and \textbf{A}ttribution), a tri-axis compute-allocation framework that decides computation \textit{when} events occur, \textit{where} hazards exist, and \textit{which} cache entries matter for generation. CERA integrates: (1) \textit{Event-Triggered Gating} with risk-sensitive detector training; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards; and (3) \textit{Frequency-Aware Sparse Decoding} that uses dominant RoPE frequency chunks as a training-free proxy for online token saliency. A lightweight hazard-priority prompting stage improves safety-specific description quality with minimal latency overhead. In pilot single-seed runs on UCF-Crime and XD-Violence, CERA reaches \textbf{48.2/48.0 FPS} (Core/Full) while retaining \textbf{98.8--99.4\% CIDEr} relative to a strong multimodal baseline (LLaVA-1.5). It also maintains gains above \textbf{8.5$\times$} in internal runtime stress tests. This draft reports deterministic pilot runs; multi-seed confidence intervals and paired significance tests are scheduled for the final statistical release.
 
 \keywords{Vision-Language Models, Efficient Inference, Surveillance, Token Pruning, KV Cache Optimization, Sparse Attention}
 \end{abstract}
@@ -77,7 +77,7 @@ Deploying these models in surveillance remains hard. Video-oriented VLM systems 
 Most acceleration methods optimize only one axis and leave others as hidden bottlenecks. Temporal filtering methods (e.g., SeViLA~\cite{sevila}) reduce frame count but keep dense token processing and full decoding state. Spatial token compression methods (ToMe, DynamicViT, EViT, ATS, SPViT)~\cite{tome,dynamicvit,evit,ats,spvit} reduce vision cost but are often domain-agnostic, risking removal of small high-risk cues. Decoding acceleration methods (StreamingLLM, H2O, SnapKV, PyramidKV)~\cite{streamingllm,h2o,snapkv,pyramidkv} are primarily studied in text-centric long-context settings. Therefore single-axis acceleration saturates quickly in end-to-end surveillance pipelines.
 
 \paragraph{Our Approach: CERA.}
-We propose \textbf{CERA}, a cascaded framework built on a simple systems principle: allocate computation only \textit{when} an event occurs, \textit{where} the hazard is located, and \textit{which} memory entries are relevant for generation.
+We propose \textbf{CERA}, a cascaded framework for \textbf{causal event reasoning (CER)} under strict latency budgets. Its systems principle is simple: allocate computation only \textit{when} an event occurs, \textit{where} the hazard is located, and \textit{which} memory entries are relevant for generation.
 \begin{enumerate}
     \item \textbf{Event-Triggered Gating} (Temporal) uses a lightweight detector with \textit{risk-sensitive loss} to suppress background frames while preserving recall on critical hazards.
     \item \textbf{Knowledge-Guided Token Pruning} (Spatial) converts detector priors into dynamic token masks, with \textit{adaptive dilation} for amorphous hazards such as fire and smoke.
@@ -88,7 +88,7 @@ These three stages are \textbf{training-free} with respect to the VLM backbone, 
 
 \paragraph{Contributions.}
 \begin{itemize}
-    \item We present \textbf{CERA}, the first surveillance-oriented VLM framework that jointly optimizes temporal, spatial, and decoding efficiency in a single end-to-end pipeline.
+    \item We present \textbf{CERA}, a surveillance-oriented framework for causal event reasoning and attribution that jointly optimizes temporal, spatial, and decoding efficiency in a single end-to-end pipeline.
     \item We introduce \textbf{risk-sensitive gating} and \textbf{adaptive spatial pruning}, which explicitly encode hazard severity and object morphology to preserve critical evidence under aggressive compute budgets.
     \item We adapt \textbf{frequency-aware sparse decoding} to mixed visual-textual generation, showing that dominant RoPE frequency chunks are an effective training-free proxy for KV saliency.
     \item On UCF-Crime and XD-Violence pilot runs, CERA delivers about \textbf{9$\times$} throughput gains. Caption quality remains near baseline (98.8--99.4\% CIDEr retention), supporting real-time multi-camera deployment in the pilot regime.
