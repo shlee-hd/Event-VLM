@@ -1,5 +1,21 @@
 # Event-VLM Paper Changelog
 
+## v21 (2026-02-18)
+- Increased `fig:frontier` display width from `0.96\textwidth` to `\textwidth` to improve in-paper readability of the speed-quality plot.
+- Kept prior float-placement stabilization (`[!b]`) unchanged.
+- Validation results after rebuild:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - underfull vbox: `1` (non-blocking float-output boundary warning)
+  - undefined references/citations: none
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v21/main.tex`
+  - `paper/versions/v21/main.bib`
+  - `paper/versions/v21/Event-VLM-paper-v21.pdf`
+  - `paper/Event-VLM-paper-v21.pdf`
+
 ## v20 (2026-02-18)
 - Applied a minimal float-placement refinement for `fig:frontier` (`[t] -> [!b]`) to improve output-page stability without changing content.
 - Validation results after rebuild:
