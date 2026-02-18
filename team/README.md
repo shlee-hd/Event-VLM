@@ -12,6 +12,7 @@ This directory defines team roles, ownership, handoff interfaces, and quality ga
 - `07_mle-infra-team.md`: reproducibility, automation, and environment reliability ownership
 - `08_release-risk-team.md`: submission quality gate and risk control ownership
 - `09_non-experiment-next-actions-2026-02-17.md`: immediate action board for all non-experiment teams
+- `10_non-experiment-command-board-2026-02-18.md`: v13 remediation command board (all teams, server-unavailable mode)
 
 ## Primary Principle
 - Every claim in the paper must map to at least one reproducible artifact (table, figure, or log).

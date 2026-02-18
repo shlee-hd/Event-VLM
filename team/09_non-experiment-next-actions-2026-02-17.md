@@ -26,3 +26,4 @@ Scope: execute next steps for all teams except Experiment Team.
 - Writing & Figure Team: `paper/reviews/2026-02-18_writing-figure-polish-plan.md` 업데이트 (PARTIAL, v9 figure/layout corrections 반영).
 - Data & Benchmark Team: `paper/reviews/2026-02-18_benchmark-expansion-plan.md` 업데이트 (P0 open, 추가 benchmark 필요로 확정).
 - Release & Risk Team: `paper/reviews/2026-02-18_release-risk-gate.md` 업데이트 (v8 figure risk closed in v9).
+- Cross-team command board: `team/10_non-experiment-command-board-2026-02-18.md` 생성 (v13 기준 서버-불가 모드 지휘안).
