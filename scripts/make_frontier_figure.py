@@ -51,16 +51,33 @@ COLORS = {
 
 def size_from_gflops(g):
     # Smaller GFLOPs -> larger marker (better efficiency)
-    return 900 / np.sqrt(g)
+    return 1200 / np.sqrt(g)
 
 
 def annotate(ax, x, y, label, color):
-    dx = 0.55 if 'Event-VLM' in label else 0.35
-    dy = 0.18 if label in ('Event-VLM-Core', 'Event-VLM-Full') else 0.08
-    ax.text(x + dx, y + dy, label, fontsize=9.5, color=color, fontweight='bold' if 'Event-VLM' in label else 'normal')
+    offsets = {
+        'Video-LLaMA': (0.25, 0.08),
+        'LLaVA-1.5': (0.35, 0.08),
+        'SeViLA': (0.35, 0.08),
+        'LLaVA+ToMe': (0.35, 0.06),
+        'LLaVA+SnapKV': (0.35, 0.08),
+        'Event-VLM-Core': (0.45, 0.14),
+        'Event-VLM-Full': (0.45, 0.20),
+    }
+    dx, dy = offsets.get(label, (0.35, 0.08))
+    ax.text(
+        x + dx,
+        y + dy,
+        label,
+        fontsize=11.0,
+        color=color,
+        fontweight='bold' if 'Event-VLM' in label else 'normal',
+        bbox=dict(facecolor='white', edgecolor='none', alpha=0.60, pad=0.2),
+        zorder=4,
+    )
 
 
-fig, axes = plt.subplots(1, 2, figsize=(13.8, 5.6), dpi=180, sharex=True)
+fig, axes = plt.subplots(1, 2, figsize=(13.8, 5.6), dpi=240, sharex=True)
 
 datasets = [
     ('UCF-Crime', FPS_UCF, CIDER_UCF, GFLOPS_UCF),
@@ -70,28 +87,27 @@ datasets = [
 for ax, (name, fps, cider, gflops) in zip(axes, datasets):
     for m, x, y, g in zip(METHODS, fps, cider, gflops):
         c = COLORS[m]
-        ax.scatter(x, y, s=size_from_gflops(g), color=c, edgecolors='black', linewidths=0.7, alpha=0.9, zorder=3)
+        ax.scatter(x, y, s=size_from_gflops(g), color=c, edgecolors='black', linewidths=1.0, alpha=0.92, zorder=3)
         annotate(ax, x, y, m, c)
 
     # Draw frontier emphasis line for ours
-    ax.plot([fps[-2], fps[-1]], [cider[-2], cider[-1]], color='#0a9396', linewidth=2.5, zorder=2)
+    ax.plot([fps[-2], fps[-1]], [cider[-2], cider[-1]], color='#0a9396', linewidth=3.0, zorder=2)
 
-    ax.set_title(f'{name}', fontsize=15, fontweight='bold')
-    ax.set_xlabel('Throughput (FPS)', fontsize=11)
+    ax.set_title(f'{name}', fontsize=17, fontweight='bold')
+    ax.set_xlabel('Throughput (FPS)', fontsize=13)
     ax.set_xlim(0, 52)
     ypad = 0.7 if name == 'UCF-Crime' else 0.8
     ax.set_ylim(min(cider) - ypad, max(cider) + ypad)
-    ax.tick_params(labelsize=10)
+    ax.tick_params(labelsize=11)
 
-axes[0].set_ylabel('Caption Quality (CIDEr)', fontsize=11)
+axes[0].set_ylabel('Caption Quality (CIDEr)', fontsize=13)
 
 # Legend-like marker scale note
 for g in [450, 180, 90, 45]:
-    axes[1].scatter([], [], s=size_from_gflops(g), color='#bbbbbb', edgecolors='black', linewidths=0.7, label=f'{g} GFLOPs')
-leg = axes[1].legend(title='Marker size = efficiency', loc='lower right', fontsize=8.5, title_fontsize=9.5, frameon=True)
+    axes[1].scatter([], [], s=size_from_gflops(g), color='#bbbbbb', edgecolors='black', linewidths=0.9, label=f'{g} GFLOPs')
+leg = axes[1].legend(title='Marker size = efficiency', loc='lower right', fontsize=10.5, title_fontsize=11.5, frameon=True)
 leg.get_frame().set_alpha(0.92)
 
-fig.suptitle('Speed-Quality Frontier of Explanation-Capable Models', fontsize=19, fontweight='bold', y=1.01)
 fig.tight_layout()
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
