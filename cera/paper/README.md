@@ -9,11 +9,15 @@ This folder contains the CERA paper draft cloned from the latest Event-VLM basel
 From repository root:
 
 ```bash
-cd paper
-latexmk -pdf -interaction=nonstopmode main.tex
+cd cera/paper
+make pdf
 ```
 
-Note: style files (`eccv.sty`, `eccvabbrv.sty`) are currently managed under the legacy `paper/` workspace.
+`make pdf` first runs `bootstrap-style`:
+- If `cera/paper/eccv.sty` and `cera/paper/eccvabbrv.sty` exist, it uses them.
+- Otherwise, it copies them from `paper/` if available.
+- Build output is generated in `cera/paper/build/`.
+- Build engine preference: `latexmk` first, then `pdflatex` fallback.
 
 ## Naming conventions
 
