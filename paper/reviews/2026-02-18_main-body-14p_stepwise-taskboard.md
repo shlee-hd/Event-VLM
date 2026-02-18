@@ -17,11 +17,11 @@
 ## Next Micro Tasks (Post-14p Stabilization)
 - [x] T09: Remove overfull line at `paper/main.tex:65` by splitting/simplifying Intro sentence.
 - [x] T10: Remove overfull lines at `paper/main.tex:104`, `paper/main.tex:112`, `paper/main.tex:115` via micro wording trim in Related Work.
-- [ ] T11: Remove overfull line at `paper/main.tex:421` (XD-Violence summary sentence).
+- [x] T11: Remove overfull line at `paper/main.tex:421` (XD-Violence summary sentence).
 - [ ] T12: Remove overfull line at `paper/main.tex:543` (runtime-robustness appendix-reference sentence).
 - [ ] T13: Reduce appendix traceability-table underfull warnings by tightening row labels at `paper/main.tex:630`.
 - [ ] T14: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
 - [ ] T15: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
 
 ## Current Focus
-- T11 only: Remove overfull line at `paper/main.tex:421` (XD-Violence summary sentence).
+- T12 only: Remove overfull line at `paper/main.tex:543` (runtime-robustness appendix-reference sentence).
