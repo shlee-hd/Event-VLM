@@ -28,9 +28,12 @@
 - [x] T19: Eliminate remaining underfull hbox at `paper/main.tex:827` (appendix failure table).
 - [x] T20: Diagnose residual underfull vbox warning and apply minimal safe fix if possible.
 - [x] T21: Final rebuild/warning report and create `v19` snapshot if stable.
+- [x] T22: Try minimal float-placement tweak around `fig:frontier` to remove residual underfull vbox.
+- [x] T23: Rebuild and verify page-budget/refs unchanged after T22.
+- [ ] T24: If stable, create `v20` snapshot + changelog update.
 
 ## Current Focus
-- Completed through T21. Next work should only be content-level improvements or new experiment integration.
+- T24 only: If stable, create `v20` snapshot + changelog update.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
@@ -38,6 +41,7 @@
 - Post-T18 update: overfull hbox 0, underfull hbox 1 (`paper/main.tex:827`, badness 1117), underfull vbox 1.
 - Post-T19 update: overfull hbox 0, underfull hbox 0, underfull vbox 1.
 - Post-T21 final update: overfull hbox 0, underfull hbox 0, underfull vbox 1 (float-output boundary only).
+- Post-T23 update: underfull vbox persists but badness is reduced (4492 -> 1097) with `fig:frontier` placement tuned to `[!b]`; page-budget and references remain unchanged.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.
