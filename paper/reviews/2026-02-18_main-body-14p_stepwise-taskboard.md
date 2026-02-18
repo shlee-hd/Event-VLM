@@ -36,12 +36,12 @@
 - [x] T27: If T25/T26 are stable, create `v21` snapshot + changelog update.
 - [x] T28: Audit main-text tables for vertical whitespace inefficiency and list merge/appendix candidates (no edits).
 - [x] T29: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
-- [ ] T30: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
-- [ ] T31: Rebuild and verify warning/page-budget impact after T29/T30.
+- [x] T30: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
+- [x] T31: Rebuild and verify warning/page-budget impact after T29/T30.
 - [ ] T32: If stable, create `v22` snapshot + changelog update.
 
 ## Current Focus
-- T30 only: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
+- T32 only: Create `v22` snapshot + changelog update.
 
 ## T28 Audit Findings (No Edits)
 - Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
@@ -61,6 +61,7 @@
 - Post-T26 update: after widening `fig:frontier` to `\textwidth`, warnings remain stable (overfull 0 / underfull hbox 0 / underfull vbox 1), no undefined refs/citations, and appendix still starts at page 19.
 - Post-T27 update: `v21` snapshot created and version docs updated.
 - Post-T29 update: warning profile remains stable (overfull 0 / underfull hbox 0 / underfull vbox 1), no float-only-page warning, and appendix still starts at page 19.
+- Post-T31 update: after Fig.3 footprint/placement tuning (`width=0.95\textwidth`, `[!b]`), warnings are fully cleared (overfull 0 / underfull hbox 0 / underfull vbox 0), undefined refs/citations none, appendix still starts at page 19.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.

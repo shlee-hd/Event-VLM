@@ -474,9 +474,9 @@ Fig.~\ref{fig:frontier} visualizes the same trend from Tables~\ref{tab:main_resu
 \subsubsection{Three-Axis Component Analysis.}
 Table~\ref{tab:ablation_component} demonstrates the contribution of each axis. The temporal axis (Event Trigger) provides the largest speedup by skipping background frames. The spatial axis (Token Pruning) further boosts FPS from 18.5 to 38.5. The decoding axis (Frequency-Aware Sparse Decoding) provides an additional 25\% speedup (38.5 $\to$ 48.2 FPS) by reducing KV cache memory bandwidth during generation. The prompt tuning slightly improves quality without affecting speed. Marginal gain accounting is summarized in Table~\ref{tab:axis_gain} (Appendix). Fig.~\ref{fig:component_breakdown} complements this quantitative decomposition by visualizing the hazard-aware design details (risk-sensitive weighting, adaptive dilation, and prompt routing).
 
-\begin{figure}[t]
+\begin{figure}[!b]
   \centering
-  \includegraphics[width=0.98\textwidth]{figures/figure2_components.png}
+  \includegraphics[width=0.95\textwidth]{figures/figure2_components.png}
   \caption{\textbf{Hazard-Aware Component Details.} The figure illustrates three design elements used in Event-VLM: class-weighted risk-sensitive loss, adaptive dilation by hazard morphology, and hazard-priority prompt routing. These components explain how safety-critical cues are preserved under aggressive compute reduction.}
   \label{fig:component_breakdown}
 \end{figure}
