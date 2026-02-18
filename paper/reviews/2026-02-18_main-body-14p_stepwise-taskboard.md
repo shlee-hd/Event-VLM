@@ -35,13 +35,13 @@
 - [x] T26: Rebuild and verify warning/page-budget impact of T25.
 - [x] T27: If T25/T26 are stable, create `v21` snapshot + changelog update.
 - [x] T28: Audit main-text tables for vertical whitespace inefficiency and list merge/appendix candidates (no edits).
-- [ ] T29: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
+- [x] T29: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
 - [ ] T30: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
 - [ ] T31: Rebuild and verify warning/page-budget impact after T29/T30.
 - [ ] T32: If stable, create `v22` snapshot + changelog update.
 
 ## Current Focus
-- T29 only: Apply exactly one table compaction action from T28 (merge or appendix move), then rebuild.
+- T30 only: Reduce Fig.3 (`fig:component_breakdown`) footprint with minimal readability-safe scale/aspect adjustment.
 
 ## T28 Audit Findings (No Edits)
 - Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
@@ -49,6 +49,7 @@
 - Candidate B (high savings / moderate claim risk): move `tab:latency_stream` (`paper/main.tex:515`) to appendix and keep the stream-capacity formula + one headline number in main text.
 - Candidate C (moderate savings / low risk): tighten vertical whitespace of `tab:quality_retention` (`paper/main.tex:425`) by reducing caption/body padding and converting to a compact table style.
 - Excluded for now (core evidence in main narrative): `tab:main_results`, `tab:main_results_xd`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:method_comparison`.
+- T29 execution note: Candidate A (moving `tab:eval_protocol`) was tested and rejected due warning regression (`Text page contains only floats` + worse vbox badness). Candidate C was adopted instead by compacting `tab:quality_retention` style in place.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
@@ -59,6 +60,7 @@
 - Post-T23 update: underfull vbox persists but badness is reduced (4492 -> 1097) with `fig:frontier` placement tuned to `[!b]`; page-budget and references remain unchanged.
 - Post-T26 update: after widening `fig:frontier` to `\textwidth`, warnings remain stable (overfull 0 / underfull hbox 0 / underfull vbox 1), no undefined refs/citations, and appendix still starts at page 19.
 - Post-T27 update: `v21` snapshot created and version docs updated.
+- Post-T29 update: warning profile remains stable (overfull 0 / underfull hbox 0 / underfull vbox 1), no float-only-page warning, and appendix still starts at page 19.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.
