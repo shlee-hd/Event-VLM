@@ -540,8 +540,8 @@ As event density increases, throughput degrades gracefully rather than collapsin
 This internal scaling table is moved to the appendix to keep the main narrative focused on headline comparisons.
 
 \subsubsection{Protocol Robustness Across Resolution and Decode Length.}
-Appendix Table~\ref{tab:runtime_robustness} indicates that the proposed three-axis strategy is robust to deployment-level runtime changes. The quality-retention trend remains near 99\% while speed gains stay above 8.5$\times$ even under heavier 448px/384-token settings.
-This protocol-shift robustness table is moved to the appendix to reduce main-text footprint.
+Appendix Table~\ref{tab:runtime_robustness} shows that the three-axis strategy is robust to deployment-level runtime changes. Quality retention stays near 99\%, and speed gains remain above 8.5$\times$ under 448px/384-token settings.
+We move this robustness table to the appendix to reduce main-text footprint.
 
 \subsubsection{Statistical Sufficiency and Current Scope.}
 This Draft V1 reports deterministic pilot runs (single-seed execution) to validate systems-level trends before full statistical release. For the final version, we will add 3-seed repetitions for each reproduced VLM setting, 95\% bootstrap confidence intervals for AUC/CIDEr, and paired significance tests on per-video metrics. We also schedule an additional surveillance benchmark (ShanghaiTech-style protocol) to reduce cross-dataset generalization risk. In this draft, small deltas (within $\pm$0.4 AUC or $\pm$0.5 CIDEr) should be interpreted as directional rather than conclusive.
