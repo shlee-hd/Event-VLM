@@ -1,5 +1,21 @@
 # Event-VLM Paper Changelog
 
+## v19 (2026-02-18)
+- Executed final post-v18 stabilization closure (`T19`--`T21`) with strict one-micro-task workflow.
+- Cleared remaining hbox warning in appendix failure table by compact wording update (`paper/main.tex:827`).
+- Final verification status:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - remaining warning: one `Underfull \vbox ... while \output is active` at a float-output page boundary (non-blocking).
+  - undefined references/citations: none
+  - appendix start remains page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v19/main.tex`
+  - `paper/versions/v19/main.bib`
+  - `paper/versions/v19/Event-VLM-paper-v19.pdf`
+  - `paper/Event-VLM-paper-v19.pdf`
+
 ## v18 (2026-02-18)
 - Continued stepwise residual-warning cleanup after v17 (`T16`--`T18` in taskboard).
 - Text/layout refinements:
