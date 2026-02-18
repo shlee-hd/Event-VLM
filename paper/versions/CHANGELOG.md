@@ -1,5 +1,23 @@
 # Event-VLM Paper Changelog
 
+## v24 (2026-02-18)
+- Improved Fig.3 readability while preserving page footprint:
+  - regenerated `figure2_components.png` with larger internal labels and higher render DPI (source-level update),
+  - kept `main.tex` figure placement/width settings unchanged for stable layout.
+- Validation results after rebuild:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - underfull vbox: `0`
+  - float-only-page warning: `0`
+  - undefined references/citations: none
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v24/main.tex`
+  - `paper/versions/v24/main.bib`
+  - `paper/versions/v24/Event-VLM-paper-v24.pdf`
+  - `paper/Event-VLM-paper-v24.pdf`
+
 ## v23 (2026-02-18)
 - Improved Fig.2(a) readability while preserving page footprint:
   - regenerated `figure4_frontier.png` with larger axis/annotation/legend typography and larger markers,

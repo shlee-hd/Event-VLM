@@ -32,3 +32,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v21`: frontier figure width readability pass with stable warning/page-budget state (`paper/versions/v21/`)
 - `v22`: table/figure footprint tuning pass with fully clean layout warnings and unchanged 14p main-body budget (`paper/versions/v22/`)
 - `v23`: Fig.2(a) typography/readability improvement pass with clean warning/page-budget state (`paper/versions/v23/`)
+- `v24`: Fig.3 inner-label readability polish with clean warning/page-budget state (`paper/versions/v24/`)

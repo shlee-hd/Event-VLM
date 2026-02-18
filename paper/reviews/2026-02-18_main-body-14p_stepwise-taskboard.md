@@ -45,10 +45,11 @@
 - [x] T36: If stable, create `v23` snapshot + changelog update.
 - [x] T37: Final micro QA for submission bundle (`v23` PDF + version docs consistency) and capture only blockers.
 - [x] T38: Optional follow-up: raise Fig.3 inner-label readability (source-level simplification) without increasing footprint.
-- [ ] T39: If stable, create `v24` snapshot + changelog update.
+- [x] T39: If stable, create `v24` snapshot + changelog update.
+- [ ] T40: Final hold-point check (v24 baseline) and wait for next directed reviewer edit.
 
 ## Current Focus
-- T39 only: Create `v24` snapshot + changelog update.
+- T40 only: Final hold-point check and wait.
 
 ## T28 Audit Findings (No Edits)
 - Scope audited (main text only): `tab:method_comparison`, `tab:eval_protocol`, `tab:main_results`, `tab:main_results_xd`, `tab:quality_retention`, `tab:ablation_component`, `tab:decoding_comparison`, `tab:latency_stream`.
@@ -88,6 +89,7 @@
   - Regenerated `figure2_components.png` with larger internal typography and higher render DPI (function-local override) while keeping `main.tex` footprint settings unchanged.
   - Zoomed page render confirms improved Fig.3 inner-label readability vs v23 baseline.
   - Build/profile unchanged: overfull 0 / underfull hbox 0 / underfull vbox 0 / float-only-page warning 0; appendix page starts at 19.
+- Post-T39 update: `v24` snapshot created (`paper/Event-VLM-paper-v24.pdf`) and version docs updated.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
 - T20 note: the remaining warning is `Underfull \vbox ... while \output is active`, observed at a float-output page boundary (around Fig.2/Fig.4 placement); no safe local text/line fix was identified without template-level layout policy changes.
