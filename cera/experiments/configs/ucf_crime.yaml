@@ -1,0 +1,39 @@
+# CERA UCF-Crime dataset configuration
+
+defaults:
+  - base
+
+data:
+  name: "ucf_crime"
+  root_dir: "data/ucf_crime"
+  frame_rate: 1
+  max_frames: 500
+
+# UCF-Crime has 13 anomaly classes
+detector:
+  hazard_classes:
+    critical:
+      - explosion
+      - shooting
+      - arson
+    high:
+      - fighting
+      - assault
+      - robbery
+      - burglary
+    standard:
+      - abuse
+      - arrest
+      - road_accidents
+      - stealing
+      - shoplifting
+      - vandalism
+
+# Evaluation settings
+evaluation:
+  split: "test"
+  metrics:
+    - auc
+    - ap
+    - fps
+    - token_reduction

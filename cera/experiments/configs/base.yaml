@@ -1,0 +1,117 @@
+# Base configuration for CERA
+# Seed config for CERA experiment runs
+
+defaults:
+  - _self_
+
+# Detector configuration (Stage 1)
+detector:
+  model: "detr-l"  # detr-l, yolov8s, yolov8n
+  pretrained: true
+  conf_threshold: 0.5
+  iou_threshold: 0.45
+  risk_weights:
+    critical: 3.0
+    high: 2.0
+    standard: 1.0
+  hazard_classes:
+    critical:
+      - fire
+      - smoke
+      - collapse
+      - explosion
+    high:
+      - forklift
+      - crane
+      - machinery
+      - fall
+    standard:
+      - person
+      - vehicle
+      - helmet
+      - vest
+
+# Pruning configuration (Stage 2)
+pruning:
+  enabled: true
+  alpha_base: 1.2
+  beta: 0.5
+  min_tokens: 64
+  preserve_cls_token: true
+  shape_variance:
+    fire: 0.42
+    smoke: 0.38
+    explosion: 0.45
+    person: 0.12
+    vehicle: 0.08
+    forklift: 0.15
+    default: 0.20
+
+# Multimodal reasoning backbone (Stage 3)
+vlm:
+  model: "llava-1.5-7b"
+  quantization: "4bit"
+  max_new_tokens: 256
+  temperature: 0.2
+  do_sample: false
+  prompt_strategy: "hazard_priority"
+
+# Data configuration
+data:
+  name: "ucf_crime"
+  root_dir: "data/"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  num_workers: 4
+  frame_rate: 1
+  max_frames: 300
+  image_size: 336
+
+# Training configuration
+training:
+  epochs: 50
+  batch_size: 16
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 500
+  gradient_accumulation: 4
+  mixed_precision: "fp16"
+  save_dir: "checkpoints/cera/"
+  save_every: 5
+  log_every: 100
+  use_wandb: true
+  wandb_project: "cera"
+
+# Auto-tuning configuration
+auto_tune:
+  n_trials: 100
+  timeout: null
+  study_name: "cera_tuning"
+  storage: null
+  search_space:
+    lambda_crit:
+      low: 2.0
+      high: 5.0
+    lambda_high:
+      low: 1.5
+      high: 3.0
+    alpha_base:
+      low: 1.1
+      high: 1.5
+    beta:
+      low: 0.3
+      high: 0.8
+    conf_threshold:
+      low: 0.3
+      high: 0.7
+  objectives:
+    - auc
+    - fps
+  objective_weights:
+    - 1.0
+    - 0.5
+
+# Device configuration
+device: "cuda"
+seed: 42

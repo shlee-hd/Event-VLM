@@ -1,0 +1,37 @@
+# CERA XD-Violence dataset configuration
+
+defaults:
+  - base
+
+data:
+  name: "xd_violence"
+  root_dir: "data/xd_violence"
+  frame_rate: 1
+  max_frames: 600
+
+# XD-Violence has 6 violence classes
+detector:
+  hazard_classes:
+    critical:
+      - explosion
+      - shooting
+    high:
+      - fighting
+      - car_accident
+    standard:
+      - abuse
+      - riot
+
+# Multimodal settings (XD-Violence has audio)
+multimodal:
+  use_audio: false
+  audio_weight: 0.3
+
+# Evaluation settings
+evaluation:
+  split: "test"
+  metrics:
+    - ap
+    - auc
+    - fps
+    - token_reduction
