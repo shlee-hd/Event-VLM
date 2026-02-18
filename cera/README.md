@@ -1,6 +1,7 @@
 # CERA Workspace
 
-This directory is an isolated workspace for the CERA line of work, separate from the existing Event-VLM artifacts.
+This directory is an isolated workspace for CERA.
+The active paper draft is a clean-room restart from the CERA keyword only.
 
 ## Naming lock
 
@@ -10,13 +11,14 @@ This directory is an isolated workspace for the CERA line of work, separate from
 
 ## Structure
 
-- `paper/`: ECCV paper draft and version snapshots for CERA
+- `paper/`: active clean-room CERA draft and snapshots
+- `archive/`: archived seed materials from earlier migrated drafts
 - `experiments/`: CERA-specific experiment config seeds
 - `notes/`: kickoff and decision notes
 - `scripts/`: workspace guardrails (e.g., naming checks)
 
 ## Next immediate tasks
 
-1. Re-generate figures/tables under CERA naming and update captions.
-2. Link CERA configs to dedicated run scripts (instead of shared legacy entry points).
-3. Decide whether to keep `CERA-Core` / `CERA-Full` variant names or move to CER-based variant labels.
+1. Fill Introduction with CERA-first problem statement and scope.
+2. Define first Method subsection (notations + one core mechanism).
+3. Add minimum baseline/evaluation plan before expanding experiments.

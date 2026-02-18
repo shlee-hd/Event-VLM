@@ -18,7 +18,7 @@ pdf: bootstrap-style
 	elif command -v $(PDFLATEX) >/dev/null 2>&1; then \
 		$(PDFLATEX) -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
 		if command -v $(BIBTEX) >/dev/null 2>&1; then \
-			(cd $(OUTDIR) && BIBINPUTS=..: $(BIBTEX) $(DOC)) || true; \
+			(cd $(OUTDIR) && $(BIBTEX) $(DOC)) || true; \
 		fi; \
 		$(PDFLATEX) -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
 		$(PDFLATEX) -interaction=nonstopmode -output-directory=$(OUTDIR) $(MAIN); \
