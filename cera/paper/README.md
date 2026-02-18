@@ -32,3 +32,11 @@ make pdf
 - [x] Introduce expanded acronym at first appearance in abstract
 - [ ] Re-check figure captions and axis labels after figure regeneration
 - [ ] Re-check table text for any legacy wording after experiment reruns
+
+## Guardrail
+
+Run naming guard before paper commits:
+
+```bash
+bash cera/scripts/check_naming_guard.sh
+```
