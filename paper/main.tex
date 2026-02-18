@@ -824,7 +824,7 @@ Break-even time vs baseline & \textless{}2 min & at 1 FPS, 16 streams \\
 Small distant hazards & Tiny fire/smoke regions fall below trigger confidence. Mitigation: class-specific low-confidence rescue path + temporal accumulation. \\
 Heavy occlusion & Critical interactions are partially hidden by foreground structures. Mitigation: short temporal memory in trigger and multi-frame consensus. \\
 Motion blur / camera shake & Bounding box localization becomes unstable, degrading spatial priors. Mitigation: blur-aware confidence calibration and robust dilation fallback. \\
-Prompt over-specificity & High-priority prompts may overfit rare hazard narratives; mitigation: confidence-based interpolation between standard and critical templates. \\
+Prompt over-specificity & High-priority prompts can bias toward rare hazard narratives; mitigation: confidence-based interpolation between standard and critical templates. \\
 \bottomrule
 \end{tabular}
 \caption{Representative failure modes in pilot runs and targeted mitigation strategies.}

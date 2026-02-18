@@ -25,13 +25,17 @@
 - [x] T16: Remove residual minor overfull at `paper/main.tex:84`.
 - [x] T17: Reduce residual underfull hbox at `paper/main.tex:827` in appendix failure table.
 - [x] T18: Rebuild + warning check; if stable, create `v18` snapshot and changelog entry.
+- [x] T19: Eliminate remaining underfull hbox at `paper/main.tex:827` (appendix failure table).
+- [ ] T20: Diagnose residual underfull vbox warning and apply minimal safe fix if possible.
+- [ ] T21: Final rebuild/warning report and create `v19` snapshot if stable.
 
 ## Current Focus
-- Completed through T18. Next optional micro-task is stylistic underfull cleanup for appendix float/table rows only.
+- T20 only: Diagnose residual underfull vbox warning and apply minimal safe fix if possible.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
 - Current (after T14 rebuild): overfull hbox 1 (`paper/main.tex:84`, 0.32753pt), underfull hbox 1 (`paper/main.tex:827`, badness 1259), underfull vbox 1 (output routine around float page).
 - Post-T18 update: overfull hbox 0, underfull hbox 1 (`paper/main.tex:827`, badness 1117), underfull vbox 1.
+- Post-T19 update: overfull hbox 0, underfull hbox 0, underfull vbox 1.
 - Undefined references/citations: none (`grep -i "undefined"` in `paper/build/main.log` returns empty).
 - Page-budget checkpoint: appendix still starts at page 19 (`paper/build/main.aux`), keeping main body (excluding references) within the 14-page target.
