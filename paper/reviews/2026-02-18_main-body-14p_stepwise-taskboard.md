@@ -10,9 +10,9 @@
 - [x] T03: Move `tab:axis_gain` from main text to appendix (keep references valid).
 - [x] T04: Move `tab:event_density` from main text to appendix.
 - [x] T05: Move `tab:runtime_robustness` from main text to appendix.
-- [ ] T06: Rebuild and check main-body page pressure (target: <=14 pages excluding references).
-- [ ] T07: If still over budget, move one additional low-priority table from main to appendix.
-- [ ] T08: Version snapshot + changelog update.
+- [x] T06: Rebuild and check main-body page pressure (target: <=14 pages excluding references).
+- [x] T07: If still over budget, move one additional low-priority item (table/figure) from main to appendix.
+- [x] T08: Version snapshot + changelog update.
 
 ## Current Focus
-- T06 only: main-body page pressure check and next-cut decision.
+- Completed.

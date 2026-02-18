@@ -549,14 +549,7 @@ This Draft V1 reports deterministic pilot runs (single-seed execution) to valida
 
 \subsection{Qualitative Results}
 
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=0.86\textwidth]{figures/figure3_pruning.png}
-  \caption{\textbf{Token Pruning and Sparse Decoding Visualization.} (Left) Our spatial pruning preserves hazard-critical regions. (Right) FC-based importance scores identify salient KV cache entries during decoding, focusing on safety-relevant tokens.}
-  \label{fig:qualitative}
-\end{figure}
-
-Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial pruning preserves regions containing hazards while masking background. During decoding, the FC-based importance predictor focuses attention on the most safety-relevant entries in the KV cache, enabling detailed accident description generation.
+Appendix Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial pruning preserves regions containing hazards while masking background, while the FC-based importance predictor focuses attention on safety-relevant KV cache entries during decoding.
 
 
 % --- CONCLUSION ---
@@ -840,6 +833,13 @@ Prompt over-specificity & High-priority prompt occasionally over-commits to rare
 
 \section{Qualitative Examples}
 \label{sec:qualitative_appendix}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.90\textwidth]{figures/figure3_pruning.png}
+  \caption{\textbf{Token Pruning and Sparse Decoding Visualization.} (Left) Our spatial pruning preserves hazard-critical regions. (Right) FC-based importance scores identify salient KV cache entries during decoding, focusing on safety-relevant tokens.}
+  \label{fig:qualitative}
+\end{figure}
 
 \textbf{Fire Detection:}
 \begin{itemize}

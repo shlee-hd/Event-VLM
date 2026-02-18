@@ -1,5 +1,23 @@
 # Event-VLM Paper Changelog
 
+## v16 (2026-02-18)
+- Performed stepwise page-budget refinement with micro-task tracking (`paper/reviews/2026-02-18_main-body-14p_stepwise-taskboard.md`).
+- Figure/layout updates:
+  - regenerated `figure2_components.png` to horizontal aspect for improved readability/footprint,
+  - reverted combined frontier/qualitative panel into standalone frontier figure for clearer readability,
+  - moved qualitative pruning visualization from main text to appendix.
+- Main-text footprint reduction by moving non-headline tables to appendix:
+  - `tab:axis_gain`
+  - `tab:event_density`
+  - `tab:runtime_robustness`
+- Rebuilt manuscript PDF with stable local pipeline: `bash scripts/build_paper.sh`.
+- Main-body page check (excluding references): 14 pages (appendix starts at page 19 in `build/main.aux` labels).
+- Snapshot artifacts:
+  - `paper/versions/v16/main.tex`
+  - `paper/versions/v16/main.bib`
+  - `paper/versions/v16/Event-VLM-paper-v16.pdf`
+  - `paper/Event-VLM-paper-v16.pdf`
+
 ## v15 (2026-02-18)
 - Reduced figure footprint by merging the previous Fig.3/Fig.4 content into a single horizontal two-panel figure:
   - panel (a): speed-quality frontier (`figure4_frontier.png`),
