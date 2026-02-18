@@ -52,7 +52,7 @@
 
 % --- ABSTRACT ---
 \begin{abstract}
-Real-time surveillance VLM deployment is constrained by inference economics: practical systems must process many concurrent streams while preserving explanation quality. We identify three orthogonal redundancy axes that dominate runtime cost: \textit{temporal} redundancy (most frames are non-events), \textit{spatial} redundancy (most visual tokens are background), and \textit{decoding} redundancy (auto-regressive KV-cache access is memory-bandwidth bound). We present \textbf{Event-VLM}, a tri-axis compute-allocation framework that decides computation \textit{when} events occur, \textit{where} hazards exist, and \textit{which} cache entries matter for generation. Event-VLM integrates: (1) \textit{Event-Triggered Gating} with risk-sensitive detector training; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards; and (3) \textit{Frequency-Aware Sparse Decoding} that uses dominant RoPE frequency chunks as a training-free proxy for online token saliency. A lightweight hazard-priority prompting stage improves safety-specific description quality with minimal latency overhead. On UCF-Crime and XD-Violence, Event-VLM reaches \textbf{48.2/48.0 FPS} (Core/Full) while retaining \textbf{98.8--99.4\% CIDEr} relative to LLaVA-1.5, with sustained gains above \textbf{8.5$\times$} under runtime stress regimes. This draft reports deterministic pilot runs; multi-seed confidence intervals and paired significance tests are scheduled for the final statistical release.
+Real-time surveillance VLM deployment is constrained by inference economics: practical systems must process many concurrent streams while preserving explanation quality. We identify three orthogonal redundancy axes that dominate runtime cost: \textit{temporal} redundancy (most frames are non-events), \textit{spatial} redundancy (most visual tokens are background), and \textit{decoding} redundancy (auto-regressive KV-cache access is memory-bandwidth bound). We present \textbf{Event-VLM}, a tri-axis compute-allocation framework that decides computation \textit{when} events occur, \textit{where} hazards exist, and \textit{which} cache entries matter for generation. Event-VLM integrates: (1) \textit{Event-Triggered Gating} with risk-sensitive detector training; (2) \textit{Knowledge-Guided Token Pruning} with adaptive dilation for amorphous hazards; and (3) \textit{Frequency-Aware Sparse Decoding} that uses dominant RoPE frequency chunks as a training-free proxy for online token saliency. A lightweight hazard-priority prompting stage improves safety-specific description quality with minimal latency overhead. In pilot single-seed runs on UCF-Crime and XD-Violence, Event-VLM reaches \textbf{48.2/48.0 FPS} (Core/Full) while retaining \textbf{98.8--99.4\% CIDEr} relative to LLaVA-1.5. It also maintains gains above \textbf{8.5$\times$} in internal runtime stress tests. This draft reports deterministic pilot runs; multi-seed confidence intervals and paired significance tests are scheduled for the final statistical release.
 
 \keywords{Vision-Language Models, Efficient Inference, Surveillance, Token Pruning, KV Cache Optimization, Sparse Attention}
 \end{abstract}
@@ -62,10 +62,10 @@ Real-time surveillance VLM deployment is constrained by inference economics: pra
 \section{Introduction}
 
 \paragraph{The Paradigm Shift.}
-Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal families now provide grounded explanation capability across open-domain scenes~\cite{llava,llava15,llavanext,blip,blip2,instructblip,minigpt4}. Additional multimodal assistants further strengthen this trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this distinction is operationally critical: causal accident explanation enables immediate response prioritization.
+Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal families now provide grounded explanation capability across open-domain scenes~\cite{llava,llava15,llavanext,blip,blip2,instructblip,minigpt4}. Additional multimodal assistants reinforce the same trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this distinction is operationally critical: causal accident explanation enables immediate response prioritization.
 
 \paragraph{The Scalability Bottleneck.}
-Deploying these models in surveillance remains hard. Video-oriented VLM systems improve temporal reasoning~\cite{videollama,videochat,videollava,video_chatgpt,moviechat,timechat,vila}. In parallel, temporal backbones continue to advance video understanding~\cite{timesformer,slowfast,i3d}. However, real-time multi-stream deployment is still constrained by compute and memory. Unlike offline analysis, surveillance requires persistent online inference over many cameras. We identify three orthogonal axes of computational redundancy that drive this bottleneck (Fig.~\ref{fig:framework}):
+Deploying these models in surveillance remains hard. Video-oriented VLM systems improve temporal reasoning~\cite{videollama,videochat,videollava,video_chatgpt,moviechat,timechat,vila}. Temporal backbones also continue to advance video understanding~\cite{timesformer,slowfast,i3d}. Real-time multi-stream deployment, however, is still constrained by compute and memory. Unlike offline analysis, surveillance requires persistent online inference over many cameras. We identify three orthogonal axes of computational redundancy that drive this bottleneck (Fig.~\ref{fig:framework}):
 
 \begin{itemize}
     \item \textbf{Temporal Redundancy}: In typical surveillance footage, critical events occupy less than 1\% of the total duration. Processing every frame with a heavy VLM is wasteful.
@@ -91,7 +91,7 @@ These three stages are \textbf{training-free} with respect to the VLM backbone, 
     \item We present \textbf{Event-VLM}, the first surveillance-oriented VLM framework that jointly optimizes temporal, spatial, and decoding efficiency in a single end-to-end pipeline.
     \item We introduce \textbf{risk-sensitive gating} and \textbf{adaptive spatial pruning}, which explicitly encode hazard severity and object morphology to preserve critical evidence under aggressive compute budgets.
     \item We adapt \textbf{frequency-aware sparse decoding} to mixed visual-textual generation, showing that dominant RoPE frequency chunks are an effective training-free proxy for KV saliency.
-    \item On UCF-Crime and XD-Violence pilot runs, Event-VLM delivers \textbf{$\sim$9$\times$} throughput gains while retaining near-baseline caption quality (98.8--99.4\% CIDEr retention), supporting real-time multi-camera deployment.
+    \item On UCF-Crime and XD-Violence pilot runs, Event-VLM delivers \textbf{$\sim$9$\times$} throughput gains while retaining near-baseline caption quality (98.8--99.4\% CIDEr retention). This supports real-time multi-camera deployment in the pilot regime.
 \end{itemize}
 
 
@@ -101,24 +101,18 @@ These three stages are \textbf{training-free} with respect to the VLM backbone, 
 \subsection{Large Vision-Language Models}
 The convergence of vision and language has produced VLMs capable of complex multimodal reasoning. CLIP~\cite{clip} pioneered visual-textual alignment via contrastive learning. Generative models such as Flamingo~\cite{flamingo} and BLIP-2~\cite{blip2} bridged frozen encoders with LLMs, while the LLaVA family~\cite{llava,llava15,llavanext} showed that simple projection architectures achieve remarkable visual instruction following. Qwen-VL~\cite{qwenvl} and CogVLM~\cite{cogvlm} introduced visual experts and grounding capabilities.
 
-Their visual stacks largely inherit ViT-family design advances~\cite{vit,deit,swin,pvt} and self-supervised pretraining paradigms~\cite{mae,dinov2}. For video understanding, Video-LLaMA~\cite{videollama} and VideoChat~\cite{videochat} extended image VLMs with temporal modeling, while VILA~\cite{vila} showed that video pre-training improves temporal reasoning. These models still employ heavy visual encoders with billion-parameter LLMs, and the quadratic attention complexity~\cite{attention} makes real-time deployment challenging.
+Their visual stacks largely inherit ViT-family design advances~\cite{vit,deit,swin,pvt} and self-supervised pretraining paradigms~\cite{mae,dinov2}. For video understanding, Video-LLaMA~\cite{videollama} and VideoChat~\cite{videochat} extend image VLMs with temporal modeling. VILA~\cite{vila} further shows that video pre-training improves temporal reasoning. These models still employ heavy visual encoders with billion-parameter LLMs, and quadratic attention~\cite{attention} remains expensive for real-time deployment.
 
 \subsection{Efficient Vision Transformers and Token Pruning}
-DynamicViT~\cite{dynamicvit} introduced learnable modules for progressive token discard. EViT~\cite{evit} fused less attentive tokens into representative tokens. ToMe~\cite{tome} proposed training-free token merging based on key-value similarity, achieving 2$\times$ speedup. SPViT~\cite{spvit} optimized pruning for latency. For video, SeViLA~\cite{sevila} employed keyframe selection and SlowFast~\cite{slowfast} proposed dual-pathway architectures. Latency-oriented transformer designs such as FasterViT and EfficientViT~\cite{fastervit,efficientvit} further show that architecture-level efficiency and token-level sparsification are complementary.
+DynamicViT~\cite{dynamicvit} introduced learnable modules for progressive token discard. EViT~\cite{evit} fused less attentive tokens into representative tokens. ToMe~\cite{tome} proposed training-free token merging based on key-value similarity, achieving 2$\times$ speedup. SPViT~\cite{spvit} optimized pruning for latency. For video, SeViLA~\cite{sevila} employed keyframe selection and SlowFast~\cite{slowfast} proposed dual-pathway architectures. FasterViT and EfficientViT~\cite{fastervit,efficientvit} further show that architecture-level efficiency and token-level sparsification are complementary.
 
 Despite their effectiveness, existing pruning methods rely on statistical importance without domain knowledge. In safety-critical scenarios, small hazards may have low statistical prominence and risk being pruned. Our \textbf{Knowledge-Guided Token Pruning} addresses this by leveraging detection priors~\cite{yolo}.
 
 \subsection{Vision-Language Models for Anomaly Detection}
-Traditional Video Anomaly Detection (VAD) relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal features~\cite{rtfm,i3d}.
-Recently, VLM-based approaches improved explainability. AnomalyGPT~\cite{anomalygpt} fine-tunes VLMs on defect datasets.
-Holmes-VAD~\cite{holmes_vad} adds multi-modal detection with chain-of-thought reasoning, and VADCLIP~\cite{vadclip} adapts CLIP for weakly supervised VAD.
-Weakly-supervised anomaly-learning lines~\cite{mist,mgfn,umil} provide strong localization priors but are not designed for caption-level explanation under strict latency budgets. Domain surveys in safety monitoring similarly emphasize the gap between recognition-centric pipelines and operationally reliable explanation systems~\cite{industrial_safety_survey,construction_safety}. However, these methods mainly target offline single-stream processing.
+Traditional Video Anomaly Detection (VAD) relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal features~\cite{rtfm,i3d}. Recent VLM-based approaches improved explainability. AnomalyGPT~\cite{anomalygpt} fine-tunes VLMs on defect datasets. Holmes-VAD~\cite{holmes_vad} adds multi-modal detection with chain-of-thought reasoning, and VADCLIP~\cite{vadclip} adapts CLIP for weakly supervised VAD. Weakly-supervised anomaly-learning lines~\cite{mist,mgfn,umil} provide strong localization priors, but they are not designed for caption-level explanation under strict latency budgets. Domain surveys in safety monitoring emphasize the gap between recognition-centric pipelines and operationally reliable explanation systems~\cite{industrial_safety_survey,construction_safety}. However, these methods mainly target offline single-stream processing.
 
 \subsection{KV Cache Optimization and Sparse Attention}
-The growing KV cache is a critical bottleneck for LLM inference.
-StreamingLLM~\cite{streamingllm} keeps a fixed-size window with ``attention sinks.'' H2O~\cite{h2o} evicts tokens by cumulative attention.
-SnapKV~\cite{snapkv} selects entries per layer, and PyramidKV~\cite{pyramidkv} allocates layer-wise budgets.
-However, these methods rely on heuristic importance signals and are not truly query-aware.
+The growing KV cache is a critical bottleneck for LLM inference. StreamingLLM~\cite{streamingllm} keeps a fixed-size window with ``attention sinks.'' H2O~\cite{h2o} evicts tokens by cumulative attention. SnapKV~\cite{snapkv} selects entries per layer, and PyramidKV~\cite{pyramidkv} allocates layer-wise budgets. However, these methods rely on heuristic importance signals and are not truly query-aware.
 
 FASA~\cite{fasa} recently discovered that RoPE~\cite{rope} induces \textit{functional sparsity} at the frequency-chunk level: a small subset of ``dominant'' frequency chunks captures contextual attention patterns, while the majority encode positional structures. This provides a training-free, query-aware proxy for token importance. While FASA targets text-only LLMs, we adapt this insight to the VLM setting, where visual tokens significantly inflate the KV cache.
 
@@ -330,6 +324,7 @@ To avoid apples-to-oranges comparisons, all VLM-based methods are evaluated unde
 \textbf{Event-VLM-Core} (Stages 1--3 only) and \textbf{Event-VLM-Full} (Core + Stage 4 prompt adaptation).
 Methods marked with $^{\dagger}$ are reported from their original papers under native settings and are included for contextual reference rather than strict runtime parity.
 This distinction is important for interpreting absolute FPS differences across heterogeneous model families. The unified runtime protocol is summarized in Table~\ref{tab:eval_protocol}.
+Accordingly, headline runtime claims in this paper are derived from reproduced VLM rows under the unified protocol, while $^{\dagger}$ rows are contextual anchors only.
 
 \begin{table}[t]
 \caption{\textbf{Unified Evaluation Protocol.} Shared settings for reproduced VLM-based comparisons.}
@@ -386,7 +381,7 @@ LLaVA + SnapKV~\cite{snapkv} & KV Eviction & 84.2 & 87.8 & 95.0 & 14.2 \\
 \end{tabular}
 }
 \vspace{2pt}
-{\footnotesize $^{\dagger}$ Reported from original papers under native setups; included for context.}
+{\footnotesize $^{\dagger}$ Reported from original papers under native setups; contextual only and excluded from strict runtime-parity claims.}
 \end{table}
 
 As shown in Table~\ref{tab:main_results}, traditional VAD methods are fast but not explanation-capable, while heavy VLMs provide rich captions at low throughput ($<$6 FPS). Single-axis efficient baselines provide partial gains. In contrast, \textbf{Event-VLM-Core} reaches the highest practical throughput (48.2 FPS), and \textbf{Event-VLM-Full} recovers additional quality (AUC 85.6, CIDEr 89.5) with negligible latency overhead (48.2 $\rightarrow$ 48.0 FPS). This demonstrates the complementarity of the three-axis design.
@@ -420,12 +415,10 @@ LLaVA + SnapKV~\cite{snapkv} & KV Eviction & 82.5 & 84.3 & 95.0 & 14.2 \\
 \end{tabular}
 }
 \vspace{2pt}
-{\footnotesize $^{\dagger}$ Reported from original papers under native setups; included for context.}
+{\footnotesize $^{\dagger}$ Reported from original papers under native setups; contextual only and excluded from strict runtime-parity claims.}
 \end{table}
 
-Table~\ref{tab:main_results_xd} shows that the same compute-quality pattern transfers to XD-Violence.
-Event-VLM-Core provides the highest practical throughput among explanation models.
-Event-VLM-Full recovers additional semantic quality with marginal latency overhead.
+Table~\ref{tab:main_results_xd} shows that the same compute-quality pattern transfers to XD-Violence. Event-VLM-Core provides the highest practical throughput among explanation models. Event-VLM-Full recovers additional semantic quality with marginal latency overhead.
 
 \begin{table}[t]
 \caption{\textbf{Quality Retention vs.\ LLaVA-1.5 Baseline.} Caption quality retention stays near 99\% while throughput scales by over 9$\times$.}
@@ -580,7 +573,7 @@ where $L_{e2e}^{ms}$ is end-to-end latency per processed frame in milliseconds.
 \end{table}
 
 As event density increases, throughput degrades gracefully rather than collapsing (Table~\ref{tab:event_density}). Even in the worst-case 100\% trigger setting, Event-VLM-Core remains substantially faster than the full-frame baseline while preserving caption quality.
-This table is an internal scaling analysis of Event-VLM-Core under controlled trigger load, rather than a cross-method fairness benchmark.
+This table is an internal scaling analysis of Event-VLM-Core under controlled trigger load, rather than a cross-method fairness benchmark, and is not used for headline SOTA claims.
 
 \subsubsection{Protocol Robustness Across Resolution and Decode Length.}
 \begin{table}[t]
@@ -600,7 +593,7 @@ This table is an internal scaling analysis of Event-VLM-Core under controlled tr
 \end{table}
 
 Table~\ref{tab:runtime_robustness} indicates that the proposed three-axis strategy is robust to deployment-level runtime changes. The quality-retention trend remains near 99\% while speed gains stay above 8.5$\times$ even under heavier 448px/384-token settings.
-Similar to Table~\ref{tab:event_density}, this is a robustness study under protocol shifts for the same model family.
+Similar to Table~\ref{tab:event_density}, this is a robustness study under protocol shifts for the same model family and is not used for headline SOTA claims.
 
 \subsubsection{Statistical Sufficiency and Current Scope.}
 This Draft V1 reports deterministic pilot runs (single-seed execution) to validate systems-level trends before full statistical release. For the final version, we will add 3-seed repetitions for each reproduced VLM setting, 95\% bootstrap confidence intervals for AUC/CIDEr, and paired significance tests on per-video metrics. We also schedule an additional surveillance benchmark (ShanghaiTech-style protocol) to reduce cross-dataset generalization risk. In this draft, small deltas (within $\pm$0.4 AUC or $\pm$0.5 CIDEr) should be interpreted as directional rather than conclusive.
@@ -623,9 +616,9 @@ Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial pruning p
 We introduced \textbf{Event-VLM}, a tri-axis inference framework for scalable surveillance VLMs. The core idea is to allocate computation only when needed (temporal gating), where needed (spatial pruning), and to what matters during generation (frequency-aware sparse decoding). This yields a coherent systems design rather than a collection of isolated accelerations.
 
 Our risk-sensitive trigger preserves safety recall, adaptive pruning keeps critical context under aggressive token reduction, and FC-based decoding reduces KV-bandwidth pressure without retraining the backbone.
-Under a unified runtime protocol, Event-VLM-Core maximizes throughput (48.2 FPS), while Event-VLM-Full recovers additional quality (AUC 85.6, CIDEr 89.5) with negligible overhead.
-Additional stress analyses show graceful degradation under dense-event regimes and sustained gains under heavier resolution/decoding settings.
-These results indicate that high-fidelity accident explanation and real-time multi-stream operation can be achieved simultaneously.
+Under a unified runtime protocol in pilot runs, Event-VLM-Core maximizes throughput (48.2 FPS), while Event-VLM-Full recovers additional quality (AUC 85.6, CIDEr 89.5) with negligible overhead.
+Additional stress analyses show graceful degradation under dense-event regimes and sustained gains under heavier resolution/decoding settings as internal scaling evidence.
+Taken together, these pilot results suggest that high-fidelity accident explanation and real-time multi-stream operation can be achieved simultaneously.
 
 \paragraph{Limitations and Future Work.}
 Our framework relies on the initial detector's performance; however, the risk-sensitive loss achieves 98.2\% recall on critical events. The frequency-aware decoding currently uses a uniform FC budget across layers; future work will explore layer-adaptive budgets (cf.\ PyramidKV~\cite{pyramidkv}) and extend the frequency-domain analysis to visual encoders with RoPE (e.g., EVA-02). We also plan to validate on edge devices with integer quantization.
