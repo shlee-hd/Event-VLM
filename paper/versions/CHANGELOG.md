@@ -1,5 +1,17 @@
 # Event-VLM Paper Changelog
 
+## v15 (2026-02-18)
+- Reduced figure footprint by merging the previous Fig.3/Fig.4 content into a single horizontal two-panel figure:
+  - panel (a): speed-quality frontier (`figure4_frontier.png`),
+  - panel (b): pruning/sparse-decoding qualitative visualization (`figure3_pruning.png`).
+- Replaced separate full-width floats with a minipage-based side-by-side layout and updated manuscript references to `Fig.~X(a)` / `Fig.~X(b)`.
+- Rebuilt manuscript PDF with stable local pipeline: `bash scripts/build_paper.sh`.
+- Snapshot artifacts:
+  - `paper/versions/v15/main.tex`
+  - `paper/versions/v15/main.bib`
+  - `paper/versions/v15/Event-VLM-paper-v15.pdf`
+  - `paper/Event-VLM-paper-v15.pdf`
+
 ## v14 (2026-02-18)
 - Applied claim-conservative manuscript polish after reviewer-reset request while preserving existing evidence scope:
   - tightened introductory wording to avoid overstatement and keep pilot framing explicit,

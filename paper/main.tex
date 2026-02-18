@@ -439,13 +439,22 @@ Table~\ref{tab:quality_retention} makes the headline trade-off explicit: three-a
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/figure4_frontier.png}
-  \caption{\textbf{Speed-Quality Frontier on Two Benchmarks.}
-  Event-VLM-Core and Event-VLM-Full move the operating point to the high-throughput/high-quality frontier on both UCF-Crime and XD-Violence. Marker size encodes efficiency (GFLOPs), highlighting that our gains are achieved with lower compute budgets than prior explanation-capable baselines.}
-  \label{fig:frontier}
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.24\textheight,keepaspectratio]{figures/figure4_frontier.png}\\[-1pt]
+    {\footnotesize (a) Speed-quality frontier}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.24\textheight,keepaspectratio]{figures/figure3_pruning.png}\\[-1pt]
+    {\footnotesize (b) Pruning and sparse decoding}
+  \end{minipage}
+  \caption{\textbf{Combined quantitative/qualitative evidence.}
+  (a) Event-VLM-Core and Event-VLM-Full move the operating point to the high-throughput/high-quality frontier on UCF-Crime and XD-Violence; marker size encodes efficiency (GFLOPs). (b) Spatial pruning preserves hazard-critical regions while FC-based importance highlights salient KV cache entries during decoding.}
+  \label{fig:frontier_qualitative}
 \end{figure}
 
-Fig.~\ref{fig:frontier} visualizes the same trend from Tables~\ref{tab:main_results}--\ref{tab:quality_retention}: Event-VLM dominates the practical operating region by combining near-baseline caption quality with substantially higher online throughput.
+Fig.~\ref{fig:frontier_qualitative}(a) visualizes the same trend from Tables~\ref{tab:main_results}--\ref{tab:quality_retention}: Event-VLM dominates the practical operating region by combining near-baseline caption quality with substantially higher online throughput.
 
 
 \subsection{Ablation Studies}
@@ -601,14 +610,7 @@ This Draft V1 reports deterministic pilot runs (single-seed execution) to valida
 
 \subsection{Qualitative Results}
 
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=0.98\textwidth]{figures/figure3_pruning.png}
-  \caption{\textbf{Token Pruning and Sparse Decoding Visualization.} (Left) Our spatial pruning preserves hazard-critical regions. (Right) FC-based importance scores accurately identify salient KV cache entries during decoding, focusing on safety-relevant tokens.}
-  \label{fig:qualitative}
-\end{figure}
-
-Fig.~\ref{fig:qualitative} visualizes the combined effect. The spatial pruning preserves regions containing hazards while masking background. During decoding, the FC-based importance predictor focuses attention on the most safety-relevant entries in the KV cache, enabling detailed accident description generation.
+Fig.~\ref{fig:frontier_qualitative}(b) visualizes the combined effect. The spatial pruning preserves regions containing hazards while masking background. During decoding, the FC-based importance predictor focuses attention on the most safety-relevant entries in the KV cache, enabling detailed accident description generation.
 
 
 % --- CONCLUSION ---

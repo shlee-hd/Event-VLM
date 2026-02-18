@@ -23,3 +23,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v12`: benchmark/statistical expansion run-readiness snapshot (third benchmark config + paired significance pipeline) (`paper/versions/v12/`)
 - `v13`: automatic manuscript table-rendering bridge from multi-seed/significance outputs (`paper/versions/v13/`)
 - `v14`: claim-conservative wording polish and reviewer-fairness hardening snapshot (`paper/versions/v14/`)
+- `v15`: Figure 3/4 horizontal subfigure merge for page-efficiency (`paper/versions/v15/`)
