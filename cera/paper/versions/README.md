@@ -19,3 +19,4 @@ Version history for the clean-room CERA manuscript.
 - `v2`: first Method/Experiments formalization pass, with compiled snapshot `CERA-paper-v2.pdf`.
 - `v3`: Method deepening pass (schema/validation/error taxonomy), with compiled snapshot `CERA-paper-v3.pdf`.
 - `v4`: Conclusion completion and narrative consistency pass, with compiled snapshot `CERA-paper-v4.pdf`.
+- `v5`: first bibliography and citation grounding pass, with compiled snapshot `CERA-paper-v5.pdf`.
