@@ -62,7 +62,7 @@ Real-time surveillance VLM deployment is constrained by inference economics: pra
 \section{Introduction}
 
 \paragraph{The Paradigm Shift.}
-Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal families now provide grounded explanation capability across open-domain scenes~\cite{llava,llava15,llavanext,blip,blip2,instructblip,minigpt4}. Additional multimodal assistants reinforce the same trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this distinction is operationally critical: causal accident explanation enables immediate response prioritization.
+Recent VLMs have shifted visual understanding from recognition to explanation. Instruction-tuned multimodal families now provide grounded explanation capability across open-domain scenes~\cite{llava,llava15,llavanext,blip2,instructblip}. Additional multimodal assistants reinforce the same trend~\cite{gpt4v,pali,llama_adapter,llava_med}. In Intelligent Surveillance Systems (ISS), this distinction is operationally critical: causal accident explanation enables immediate response prioritization.
 
 \paragraph{The Scalability Bottleneck.}
 Deploying these models in surveillance remains hard. Video-oriented VLM systems improve temporal reasoning~\cite{videollama,videochat,videollava,video_chatgpt,moviechat,timechat,vila}. Temporal backbones also continue to advance video understanding~\cite{timesformer,slowfast,i3d}. Real-time multi-stream deployment, however, is still constrained by compute and memory. Unlike offline analysis, surveillance requires persistent online inference over many cameras. We identify three orthogonal axes of computational redundancy that drive this bottleneck (Fig.~\ref{fig:framework}):
@@ -91,7 +91,7 @@ These three stages are \textbf{training-free} with respect to the VLM backbone, 
     \item We present \textbf{Event-VLM}, the first surveillance-oriented VLM framework that jointly optimizes temporal, spatial, and decoding efficiency in a single end-to-end pipeline.
     \item We introduce \textbf{risk-sensitive gating} and \textbf{adaptive spatial pruning}, which explicitly encode hazard severity and object morphology to preserve critical evidence under aggressive compute budgets.
     \item We adapt \textbf{frequency-aware sparse decoding} to mixed visual-textual generation, showing that dominant RoPE frequency chunks are an effective training-free proxy for KV saliency.
-    \item On UCF-Crime and XD-Violence pilot runs, Event-VLM delivers \textbf{$\sim$9$\times$} throughput gains while retaining near-baseline caption quality (98.8--99.4\% CIDEr retention). This supports real-time multi-camera deployment in the pilot regime.
+    \item On UCF-Crime and XD-Violence pilot runs, Event-VLM delivers about \textbf{9$\times$} throughput gains. Caption quality remains near baseline (98.8--99.4\% CIDEr retention), supporting real-time multi-camera deployment in the pilot regime.
 \end{itemize}
 
 
@@ -101,7 +101,7 @@ These three stages are \textbf{training-free} with respect to the VLM backbone, 
 \subsection{Large Vision-Language Models}
 The convergence of vision and language has produced VLMs capable of complex multimodal reasoning. CLIP~\cite{clip} pioneered visual-textual alignment via contrastive learning. Generative models such as Flamingo~\cite{flamingo} and BLIP-2~\cite{blip2} bridged frozen encoders with LLMs, while the LLaVA family~\cite{llava,llava15,llavanext} showed that simple projection architectures achieve remarkable visual instruction following. Qwen-VL~\cite{qwenvl} and CogVLM~\cite{cogvlm} introduced visual experts and grounding capabilities.
 
-Their visual stacks largely inherit ViT-family design advances~\cite{vit,deit,swin,pvt} and self-supervised pretraining paradigms~\cite{mae,dinov2}. For video understanding, Video-LLaMA~\cite{videollama} and VideoChat~\cite{videochat} extend image VLMs with temporal modeling. VILA~\cite{vila} further shows that video pre-training improves temporal reasoning. These models still employ heavy visual encoders with billion-parameter LLMs, and quadratic attention~\cite{attention} remains expensive for real-time deployment.
+Their visual stacks largely inherit ViT-family design advances~\cite{vit,deit,swin,pvt} and self-supervised pretraining paradigms~\cite{mae,dinov2}. For video understanding, Video-LLaMA~\cite{videollama}, VideoChat~\cite{videochat}, and VILA~\cite{vila} extend image VLMs with temporal modeling. These models still employ heavy visual encoders with billion-parameter LLMs, and quadratic attention~\cite{attention} remains expensive for real-time deployment.
 
 \subsection{Efficient Vision Transformers and Token Pruning}
 DynamicViT~\cite{dynamicvit} introduced learnable modules for progressive token discard. EViT~\cite{evit} fused less attentive tokens into representative tokens. ToMe~\cite{tome} proposed training-free token merging based on key-value similarity, achieving 2$\times$ speedup. SPViT~\cite{spvit} optimized pruning for latency. For video, SeViLA~\cite{sevila} employed keyframe selection and SlowFast~\cite{slowfast} proposed dual-pathway architectures. FasterViT and EfficientViT~\cite{fastervit,efficientvit} further show that architecture-level efficiency and token-level sparsification are complementary.
@@ -109,10 +109,10 @@ DynamicViT~\cite{dynamicvit} introduced learnable modules for progressive token 
 Despite their effectiveness, existing pruning methods rely on statistical importance without domain knowledge. In safety-critical scenarios, small hazards may have low statistical prominence and risk being pruned. Our \textbf{Knowledge-Guided Token Pruning} addresses this by leveraging detection priors~\cite{yolo}.
 
 \subsection{Vision-Language Models for Anomaly Detection}
-Traditional Video Anomaly Detection (VAD) relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal features~\cite{rtfm,i3d}. Recent VLM-based approaches improved explainability. AnomalyGPT~\cite{anomalygpt} fine-tunes VLMs on defect datasets. Holmes-VAD~\cite{holmes_vad} adds multi-modal detection with chain-of-thought reasoning, and VADCLIP~\cite{vadclip} adapts CLIP for weakly supervised VAD. Weakly-supervised anomaly-learning lines~\cite{mist,mgfn,umil} provide strong localization priors, but they are not designed for caption-level explanation under strict latency budgets. Domain surveys in safety monitoring emphasize the gap between recognition-centric pipelines and operationally reliable explanation systems~\cite{industrial_safety_survey,construction_safety}. However, these methods mainly target offline single-stream processing.
+Traditional Video Anomaly Detection (VAD) relied on reconstruction errors~\cite{ucfcrime,vad_survey} or temporal features~\cite{rtfm,i3d}. Recent VLM-based approaches improved explainability. AnomalyGPT~\cite{anomalygpt} fine-tunes VLMs on defect datasets, while Holmes-VAD~\cite{holmes_vad} and VADCLIP~\cite{vadclip} target multimodal or weakly supervised settings. Weakly supervised anomaly-learning lines~\cite{mist,mgfn,umil} provide strong localization priors, but they are not designed for caption-level explanation under strict latency budgets. Domain surveys in safety monitoring emphasize the gap between recognition-centric pipelines and operationally reliable explanation systems~\cite{industrial_safety_survey,construction_safety}. However, these methods mainly target offline single-stream processing.
 
 \subsection{KV Cache Optimization and Sparse Attention}
-The growing KV cache is a critical bottleneck for LLM inference. StreamingLLM~\cite{streamingllm} keeps a fixed-size window with ``attention sinks.'' H2O~\cite{h2o} evicts tokens by cumulative attention. SnapKV~\cite{snapkv} selects entries per layer, and PyramidKV~\cite{pyramidkv} allocates layer-wise budgets. However, these methods rely on heuristic importance signals and are not truly query-aware.
+The growing KV cache is a critical bottleneck for LLM inference. StreamingLLM~\cite{streamingllm} keeps a fixed-size window with ``attention sinks.'' H2O~\cite{h2o} evicts tokens by cumulative attention. SnapKV~\cite{snapkv} selects entries per layer, and PyramidKV~\cite{pyramidkv} allocates layer-wise budgets. These methods, however, rely on heuristic importance signals and are not truly query-aware.
 
 FASA~\cite{fasa} recently discovered that RoPE~\cite{rope} induces \textit{functional sparsity} at the frequency-chunk level: a small subset of ``dominant'' frequency chunks captures contextual attention patterns, while the majority encode positional structures. This provides a training-free, query-aware proxy for token importance. While FASA targets text-only LLMs, we adapt this insight to the VLM setting, where visual tokens significantly inflate the KV cache.
 
@@ -418,7 +418,7 @@ LLaVA + SnapKV~\cite{snapkv} & KV Eviction & 82.5 & 84.3 & 95.0 & 14.2 \\
 {\footnotesize $^{\dagger}$ Reported from original papers under native setups; contextual only and excluded from strict runtime-parity claims.}
 \end{table}
 
-Table~\ref{tab:main_results_xd} shows that the same compute-quality pattern transfers to XD-Violence. Event-VLM-Core provides the highest practical throughput among explanation models. Event-VLM-Full recovers additional semantic quality with marginal latency overhead.
+Table~\ref{tab:main_results_xd} shows that the same compute-quality pattern transfers to XD-Violence. Event-VLM-Core provides the highest practical throughput among explanation-capable models in this setting. Event-VLM-Full recovers additional semantic quality with marginal latency overhead.
 
 \begin{table}[t]
 \caption{\textbf{Quality Retention vs.\ LLaVA-1.5 Baseline.} Caption quality retention stays near 99\% while throughput scales by over 9$\times$.}
@@ -855,7 +855,7 @@ Prompt over-specificity & High-priority prompt occasionally over-commits to rare
 \textbf{PPE Violation:}
 \begin{itemize}
     \item \textit{Baseline}: ``Workers are present in the area.''
-    \item \textit{Ours}: ``Two workers are operating near heavy machinery without proper safety helmets. Potential head injury risk. Safety protocol violation detected.''
+    \item \textit{Ours}: ``Two workers are operating near heavy machinery without proper safety helmets. Potential head-injury risk and protocol violation detected.''
 \end{itemize}
 
 \end{document}

@@ -1,5 +1,20 @@
 # Event-VLM Paper Changelog
 
+## v14 (2026-02-18)
+- Applied claim-conservative manuscript polish after reviewer-reset request while preserving existing evidence scope:
+  - tightened introductory wording to avoid overstatement and keep pilot framing explicit,
+  - softened throughput/quality narrative language without changing measured numbers,
+  - simplified related-work sentences for readability while preserving citation intent,
+  - clarified contextual boundaries in XD-Violence main-result interpretation (`explanation-capable models in this setting`),
+  - refined appendix qualitative example phrasing for concise safety-risk wording.
+- Rebuilt manuscript PDF with stable local pipeline: `bash scripts/build_paper.sh`.
+- No new server experiments were executed in this version (execution deferred due to unavailable experiment server).
+- Snapshot artifacts:
+  - `paper/versions/v14/main.tex`
+  - `paper/versions/v14/main.bib`
+  - `paper/versions/v14/Event-VLM-paper-v14.pdf`
+  - `paper/Event-VLM-paper-v14.pdf`
+
 ## v13 (2026-02-18)
 - Added automated paper-table rendering stage to close the last manual gap between server experiments and manuscript updates:
   - new renderer script: `scripts/render_paper_updates.py`,

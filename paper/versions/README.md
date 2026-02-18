@@ -22,3 +22,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v11`: figure-storyline relayout (incl. new frontier figure), citation expansion, and v11 reviewer follow-up snapshot (`paper/versions/v11/`)
 - `v12`: benchmark/statistical expansion run-readiness snapshot (third benchmark config + paired significance pipeline) (`paper/versions/v12/`)
 - `v13`: automatic manuscript table-rendering bridge from multi-seed/significance outputs (`paper/versions/v13/`)
+- `v14`: claim-conservative wording polish and reviewer-fairness hardening snapshot (`paper/versions/v14/`)
