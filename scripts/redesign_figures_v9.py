@@ -2,6 +2,7 @@
 """Generate horizontal, publication-ready figures for Event-VLM v9."""
 
 from pathlib import Path
+from typing import Optional
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -26,9 +27,10 @@ plt.rcParams.update(
 )
 
 
-def save_figure(fig, path: Path):
+def save_figure(fig, path: Path, dpi_override: Optional[int] = None):
+    dpi = dpi_override if dpi_override is not None else DPI
     tmp = path.with_suffix(".tmp.png")
-    fig.savefig(tmp, dpi=DPI, bbox_inches="tight", facecolor="white", edgecolor="none")
+    fig.savefig(tmp, dpi=dpi, bbox_inches="tight", facecolor="white", edgecolor="none")
     with Image.open(tmp).convert("RGB") as im:
         im.save(path, format="PNG", optimize=True)
     tmp.unlink(missing_ok=True)
@@ -154,30 +156,30 @@ def fig2_components(path: Path):
     cols = ["#d62728", "#d62728", "#d62728", "#f39c34", "#f39c34", "#2f80c1", "#2f80c1"]
     ax1.bar(classes, weights, color=cols, edgecolor="#333", linewidth=1)
     ax1.set_ylim(0, 3.4)
-    ax1.set_ylabel("Class Weight (lambda)", fontsize=14, fontweight="bold")
-    ax1.set_title("Risk-Sensitive Loss", fontsize=18, fontweight="bold", pad=10)
+    ax1.set_ylabel("Class Weight (lambda)", fontsize=15, fontweight="bold")
+    ax1.set_title("Risk-Sensitive Loss", fontsize=20, fontweight="bold", pad=10)
     ax1.grid(axis="y", linestyle="--", alpha=0.35)
-    ax1.tick_params(axis="x", rotation=45, labelsize=12)
-    ax1.tick_params(axis="y", labelsize=12)
+    ax1.tick_params(axis="x", rotation=45, labelsize=13)
+    ax1.tick_params(axis="y", labelsize=13)
     for s in ax1.spines.values():
         s.set_linewidth(1.4)
-    ax1.text(0.1, 3.16, "CRITICAL", color="#d62728", fontsize=12, fontweight="bold")
-    ax1.text(2.8, 3.16, "HIGH", color="#f39c34", fontsize=12, fontweight="bold")
-    ax1.text(4.8, 3.16, "STANDARD", color="#2f80c1", fontsize=12, fontweight="bold")
+    ax1.text(0.1, 3.16, "CRITICAL", color="#d62728", fontsize=13, fontweight="bold")
+    ax1.text(2.8, 3.16, "HIGH", color="#f39c34", fontsize=13, fontweight="bold")
+    ax1.text(4.8, 3.16, "STANDARD", color="#2f80c1", fontsize=13, fontweight="bold")
 
     # Panel 2: adaptive dilation
     ax2 = fig.add_subplot(gs[0, 1])
     style_axes(ax2)
     ax2.set_xlim(0, 1)
     ax2.set_ylim(0, 1)
-    ax2.set_title("Adaptive Dilation", fontsize=18, fontweight="bold", pad=10)
+    ax2.set_title("Adaptive Dilation", fontsize=20, fontweight="bold", pad=10)
 
     rounded_panel(ax2, 0.22, 0.60, 0.18, 0.28, "#eff7ff", edge="#2f80c1", lw=2)
     rounded_panel(ax2, 0.56, 0.20, 0.30, 0.42, "#fff5f2", edge="#d62728", lw=2)
     rounded_panel(ax2, 0.62, 0.30, 0.18, 0.22, "#ffffff", edge="#d62728", lw=1.8)
-    ax2.text(0.31, 0.74, "small\nexpansion\ns=0.12", ha="center", va="center", fontsize=12)
-    ax2.text(0.71, 0.40, "large\nexpansion\ns=0.42", ha="center", va="center", fontsize=12)
-    ax2.text(0.49, 0.53, "adaptive\nfactor s", ha="center", va="center", fontsize=13, fontweight="bold")
+    ax2.text(0.31, 0.74, "small\n(s=0.12)", ha="center", va="center", fontsize=13)
+    ax2.text(0.71, 0.40, "large\n(s=0.42)", ha="center", va="center", fontsize=13)
+    ax2.text(0.49, 0.53, "adaptive\nfactor s", ha="center", va="center", fontsize=14, fontweight="bold")
 
     ax2.annotate("", xy=(0.56, 0.42), xytext=(0.40, 0.72), xycoords=ax2.transAxes,
                  arrowprops=dict(arrowstyle="->", lw=2, color="#333"))
@@ -193,21 +195,21 @@ def fig2_components(path: Path):
     style_axes(ax3)
     ax3.set_xlim(0, 1)
     ax3.set_ylim(0, 1)
-    ax3.set_title("Priority Prompt Routing", fontsize=18, fontweight="bold", pad=10)
+    ax3.set_title("Priority Prompt Routing", fontsize=20, fontweight="bold", pad=10)
 
     rounded_panel(ax3, 0.34, 0.78, 0.32, 0.11, "#eaf3ff", edge="#2f80c1", lw=1.8)
-    ax3.text(0.50, 0.835, "Hazard Detection", ha="center", va="center", fontsize=12, fontweight="bold")
+    ax3.text(0.50, 0.835, "Hazard Detection", ha="center", va="center", fontsize=13, fontweight="bold")
 
     rounded_panel(ax3, 0.38, 0.58, 0.24, 0.12, "#ffffff", edge="#2f80c1", lw=1.8)
-    ax3.text(0.50, 0.64, "Critical\nHazard?", ha="center", va="center", fontsize=12, fontweight="bold")
+    ax3.text(0.50, 0.64, "Critical\nHazard?", ha="center", va="center", fontsize=13, fontweight="bold")
 
     rounded_panel(ax3, 0.08, 0.34, 0.34, 0.20, "#fff0ee", edge="#d62728", lw=1.8)
     rounded_panel(ax3, 0.58, 0.34, 0.34, 0.20, "#eef6ff", edge="#2f80c1", lw=1.8)
-    ax3.text(0.25, 0.44, "Critical\nPrompt Bank", ha="center", va="center", fontsize=12, fontweight="bold", color="#b22222")
-    ax3.text(0.75, 0.44, "Standard\nPrompt Bank", ha="center", va="center", fontsize=12, fontweight="bold", color="#2f80c1")
+    ax3.text(0.25, 0.44, "Critical\nPrompt Bank", ha="center", va="center", fontsize=13, fontweight="bold", color="#b22222")
+    ax3.text(0.75, 0.44, "Standard\nPrompt Bank", ha="center", va="center", fontsize=13, fontweight="bold", color="#2f80c1")
 
     rounded_panel(ax3, 0.35, 0.14, 0.30, 0.11, "#f5f5f5", edge="#4a5568", lw=1.8)
-    ax3.text(0.50, 0.195, "VLM Output", ha="center", va="center", fontsize=12, fontweight="bold")
+    ax3.text(0.50, 0.195, "VLM Output", ha="center", va="center", fontsize=13, fontweight="bold")
 
     ax3.annotate("", xy=(0.50, 0.70), xytext=(0.50, 0.78), xycoords=ax3.transAxes,
                  arrowprops=dict(arrowstyle="->", lw=1.8, color="#333"))
@@ -220,7 +222,7 @@ def fig2_components(path: Path):
     ax3.annotate("", xy=(0.50, 0.25), xytext=(0.75, 0.34), xycoords=ax3.transAxes,
                  arrowprops=dict(arrowstyle="->", lw=1.8, color="#2f80c1"))
 
-    save_figure(fig, path)
+    save_figure(fig, path, dpi_override=180)
     plt.close(fig)
 
 
