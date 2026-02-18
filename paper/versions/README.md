@@ -28,3 +28,4 @@ This directory stores immutable snapshots of the paper by version.
 - `v17`: post-v16 warning-stabilization pass with micro wording/table-label cleanup (`paper/versions/v17/`)
 - `v18`: residual warning polish pass with clean overfull state and refreshed snapshot (`paper/versions/v18/`)
 - `v19`: post-v18 final verification snapshot with only one non-blocking float-output vbox warning (`paper/versions/v19/`)
+- `v20`: float-placement tuning snapshot with reduced residual vbox badness and unchanged 14p main-body budget (`paper/versions/v20/`)

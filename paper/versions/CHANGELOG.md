@@ -1,5 +1,20 @@
 # Event-VLM Paper Changelog
 
+## v20 (2026-02-18)
+- Applied a minimal float-placement refinement for `fig:frontier` (`[t] -> [!b]`) to improve output-page stability without changing content.
+- Validation results after rebuild:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull hbox: `0`
+  - underfull vbox: `1` (non-blocking float-output boundary warning), with badness reduced from `4492` to `1097`.
+  - undefined references/citations: none
+  - appendix starts at page 19 in `paper/build/main.aux` (main body remains within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v20/main.tex`
+  - `paper/versions/v20/main.bib`
+  - `paper/versions/v20/Event-VLM-paper-v20.pdf`
+  - `paper/Event-VLM-paper-v20.pdf`
+
 ## v19 (2026-02-18)
 - Executed final post-v18 stabilization closure (`T19`--`T21`) with strict one-micro-task workflow.
 - Cleared remaining hbox warning in appendix failure table by compact wording update (`paper/main.tex:827`).
