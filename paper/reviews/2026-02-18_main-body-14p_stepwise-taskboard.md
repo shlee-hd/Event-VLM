@@ -31,9 +31,12 @@
 - [x] T22: Try minimal float-placement tweak around `fig:frontier` to remove residual underfull vbox.
 - [x] T23: Rebuild and verify page-budget/refs unchanged after T22.
 - [x] T24: If stable, create `v20` snapshot + changelog update.
+- [x] T25: Increase `fig:frontier` display width (`0.96\textwidth` -> `\textwidth`) for readability and float-page stability.
+- [ ] T26: Rebuild and verify warning/page-budget impact of T25.
+- [ ] T27: If T25/T26 are stable, create `v21` snapshot + changelog update.
 
 ## Current Focus
-- Completed through T24. Remaining layout warning is one non-blocking float-output `Underfull \vbox`.
+- T26 only: Rebuild and verify warning/page-budget impact of T25.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
