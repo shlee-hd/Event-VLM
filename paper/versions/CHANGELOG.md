@@ -1,5 +1,22 @@
 # Event-VLM Paper Changelog
 
+## v18 (2026-02-18)
+- Continued stepwise residual-warning cleanup after v17 (`T16`--`T18` in taskboard).
+- Text/layout refinements:
+  - removed the remaining minor overfull in the method contribution list by tightening Stage-3 wording (`paper/main.tex:84`),
+  - refined appendix failure-table phrasing for better narrow-column line behavior (`paper/main.tex:827`).
+- Verification:
+  - PASS: `bash scripts/build_paper.sh`
+  - overfull hbox: `0`
+  - underfull warnings: one float-page `vbox` and one appendix-table `hbox` (non-blocking layout warnings)
+  - undefined references/citations: none
+  - appendix start remains page 19 in `paper/build/main.aux` (main body still within 14 pages excluding references).
+- Snapshot artifacts:
+  - `paper/versions/v18/main.tex`
+  - `paper/versions/v18/main.bib`
+  - `paper/versions/v18/Event-VLM-paper-v18.pdf`
+  - `paper/Event-VLM-paper-v18.pdf`
+
 ## v17 (2026-02-18)
 - Completed post-v16 stabilization micro-tasks (`T09`--`T14`) tracked in:
   - `paper/reviews/2026-02-18_main-body-14p_stepwise-taskboard.md`
