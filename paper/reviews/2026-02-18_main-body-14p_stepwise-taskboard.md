@@ -23,11 +23,11 @@
 - [x] T14: Rebuild, verify no undefined refs, and capture warning delta report in this taskboard.
 - [x] T15: If warning cleanup is stable, create next version snapshot (`v17`) and changelog entry.
 - [x] T16: Remove residual minor overfull at `paper/main.tex:84`.
-- [ ] T17: Reduce residual underfull hbox at `paper/main.tex:827` in appendix failure table.
+- [x] T17: Reduce residual underfull hbox at `paper/main.tex:827` in appendix failure table.
 - [ ] T18: Rebuild + warning check; if stable, create `v18` snapshot and changelog entry.
 
 ## Current Focus
-- T17 only: Reduce residual underfull hbox at `paper/main.tex:827` in appendix failure table.
+- T18 only: Rebuild + warning check; if stable, create `v18` snapshot and changelog entry.
 
 ## T14 Warning Delta Report
 - Baseline (start of T09 stabilization): overfull hbox 7, underfull hbox 5, underfull vbox 1.
