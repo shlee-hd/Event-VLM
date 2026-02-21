@@ -19,6 +19,6 @@ The active paper draft is a clean-room restart from the CERA keyword only.
 
 ## Next immediate tasks
 
-1. Fill Introduction with CERA-first problem statement and scope.
-2. Define first Method subsection (notations + one core mechanism).
-3. Add minimum baseline/evaluation plan before expanding experiments.
+1. Execute external-server run matrix with protocol lock (`cera/experiments/PROTOCOL_LOCK.md`).
+2. Replace projected paper blocks with measured tables using swap markers in `cera/paper/main.tex`.
+3. Finalize camera-ready polish (wording, stats report, snapshot versioning).

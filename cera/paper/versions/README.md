@@ -27,3 +27,4 @@ Version history for the clean-room CERA manuscript.
 - `v10`: experiments protocol hardening (annotations, baselines, metric formulas, reproducibility/statistics), with compiled snapshot `CERA-paper-v10.pdf`.
 - `v11`: validator/status-policy formalization and status safety metrics (`R_valid`, `R_unsafe`), with compiled snapshot `CERA-paper-v11.pdf`.
 - `v12`: non-empirical projected results completion (main table, ablation table, error breakdown, scope/conclusion sync), with compiled snapshot `CERA-paper-v12.pdf`.
+- `v13`: external-run handoff preparation (measured-swap markers, limitations section, execution package sync), with compiled snapshot `CERA-paper-v13.pdf`.
