@@ -12,6 +12,8 @@ import torch.nn as nn
 import numpy as np
 from PIL import Image
 
+from src.decoding import FCSparseSelection, KVAdapterConfig, SparseKVAdapter
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,6 +25,7 @@ class VLMOutput:
     confidence: float
     tokens_used: int
     generation_time: float
+    decoding: Optional[Dict[str, Any]] = None
 
 
 class LLaVAWrapper:
@@ -71,6 +74,7 @@ class LLaVAWrapper:
         self.tokenizer = None
         self.image_processor = None
         self.vision_tower = None
+        self.kv_adapter = SparseKVAdapter()
         
         self._loaded = False
     
@@ -172,7 +176,8 @@ class LLaVAWrapper:
         self,
         image: Union[np.ndarray, Image.Image],
         prompt: str,
-        pruned_tokens: Optional[torch.Tensor] = None
+        pruned_tokens: Optional[torch.Tensor] = None,
+        sparse_selection: Optional[Union[Dict[str, Any], FCSparseSelection]] = None
     ) -> VLMOutput:
         """
         Generate caption for image.
@@ -206,18 +211,43 @@ class LLaVAWrapper:
             full_prompt,
             return_tensors="pt"
         ).input_ids.to(self.device)
+
+        decoding = self._build_sparse_decoding(
+            sparse_selection=sparse_selection,
+            image_features=image_features,
+            input_ids=input_ids,
+            allow_visual_only_mapping=False,
+        )
+
+        generation_kwargs = {
+            "input_ids": input_ids,
+            "images": image_features if pruned_tokens is None else None,
+            "image_features": pruned_tokens,
+            "max_new_tokens": self.max_new_tokens,
+            "temperature": self.temperature,
+            "do_sample": self.do_sample,
+            "use_cache": True,
+        }
         
         # Generate
         with torch.no_grad():
-            output_ids = self.model.generate(
-                input_ids,
-                images=image_features if pruned_tokens is None else None,
-                image_features=pruned_tokens,
-                max_new_tokens=self.max_new_tokens,
-                temperature=self.temperature,
-                do_sample=self.do_sample,
-                use_cache=True
-            )
+            if (
+                decoding is not None
+                and decoding.get("adapter_status") == "sparse"
+                and hasattr(self.model, "generate_with_sparse_cache")
+            ):
+                output_ids = self.model.generate_with_sparse_cache(
+                    sparse_kv_adapter=self.kv_adapter,
+                    sparse_decoding=decoding,
+                    **generation_kwargs,
+                )
+            else:
+                if decoding is not None and decoding.get("adapter_status") == "sparse":
+                    decoding = dict(decoding)
+                    decoding["adapter_status"] = "dense_fallback"
+                    decoding["fallback_reason"] = "model_sparse_cache_hook_unavailable"
+                    decoding["kv_keep_ratio"] = 1.0
+                output_ids = self.model.generate(**generation_kwargs)
         
         # Decode
         caption = self.tokenizer.decode(
@@ -235,7 +265,8 @@ class LLaVAWrapper:
             hazard_level="unknown",  # Set by caller
             confidence=1.0,
             tokens_used=tokens_used,
-            generation_time=generation_time
+            generation_time=generation_time,
+            decoding=decoding
         )
     
     def _format_prompt(self, prompt: str) -> str:
@@ -252,6 +283,83 @@ class LLaVAWrapper:
             "patch_size": config.patch_size,
             "num_patches": (config.image_size // config.patch_size) ** 2
         }
+
+    def _build_sparse_decoding(
+        self,
+        *,
+        sparse_selection: Optional[Union[Dict[str, Any], FCSparseSelection]],
+        image_features: torch.Tensor,
+        input_ids: Optional[torch.Tensor],
+        allow_visual_only_mapping: bool,
+    ) -> Optional[Dict[str, Any]]:
+        """Normalize selector output and add KV adapter diagnostics."""
+        if sparse_selection is None:
+            return None
+
+        if isinstance(sparse_selection, FCSparseSelection):
+            payload: Dict[str, Any] = sparse_selection.to_dict()
+        elif isinstance(sparse_selection, dict):
+            payload = dict(sparse_selection)
+        else:
+            raise TypeError("sparse_selection must be FCSparseSelection or dict")
+
+        visual_token_count = self._visual_token_count(image_features)
+        mapping = dict(payload.get("kv_mapping") or {})
+        if "visual_token_count" not in mapping:
+            mapping["visual_token_count"] = visual_token_count
+
+        adapter_config = self._adapter_config_from_payload(payload)
+        adapter = SparseKVAdapter(adapter_config)
+        self.kv_adapter = adapter
+
+        sequence_length = mapping.get("sequence_length", payload.get("kv_sequence_length"))
+        visual_token_start = mapping.get(
+            "visual_token_start",
+            payload.get("visual_token_start"),
+        )
+
+        if sequence_length is None or visual_token_start is None:
+            if not allow_visual_only_mapping:
+                return {
+                    **payload,
+                    "adapter_status": "dense_fallback",
+                    "fallback_reason": "kv_mapping_uncertain",
+                    "visual_token_count": visual_token_count,
+                    "kv_keep_ratio": 1.0,
+                    "kv_evidence_retention": payload.get("evidence_retention", 1.0),
+                }
+            sequence_length = visual_token_count
+            visual_token_start = 0
+
+        decision = adapter.plan(
+            payload,
+            sequence_length=int(sequence_length),
+            visual_token_start=int(visual_token_start),
+            visual_token_count=int(mapping["visual_token_count"]),
+        )
+        return {
+            **payload,
+            **decision.to_dict(),
+        }
+
+    @staticmethod
+    def _adapter_config_from_payload(payload: Dict[str, Any]) -> KVAdapterConfig:
+        config = dict(payload.get("kv_config") or {})
+        return KVAdapterConfig(
+            sink_tokens=int(config.get("sink_tokens", payload.get("sink_tokens", 4))),
+            recent_tokens=int(config.get("recent_tokens", payload.get("recent_tokens", 32))),
+            min_keep=int(config.get("min_keep", payload.get("min_keep", 1))),
+            preserve_text_tokens=bool(config.get("preserve_text_tokens", True)),
+            dense_fallback=bool(config.get("dense_fallback", True)),
+        )
+
+    @staticmethod
+    def _visual_token_count(image_features: torch.Tensor) -> int:
+        if image_features.dim() == 0:
+            return 0
+        if image_features.dim() == 1:
+            return int(image_features.shape[0])
+        return int(image_features.shape[-2])
 
 
 class MockLLaVAWrapper(LLaVAWrapper):
@@ -275,14 +383,23 @@ class MockLLaVAWrapper(LLaVAWrapper):
         self,
         image: Union[np.ndarray, Image.Image],
         prompt: str,
-        pruned_tokens: Optional[torch.Tensor] = None
+        pruned_tokens: Optional[torch.Tensor] = None,
+        sparse_selection: Optional[Union[Dict[str, Any], FCSparseSelection]] = None
     ) -> VLMOutput:
         tokens_used = pruned_tokens.shape[1] if pruned_tokens is not None else 576
+        image_features = pruned_tokens if pruned_tokens is not None else self.encode_image(image)
+        decoding = self._build_sparse_decoding(
+            sparse_selection=sparse_selection,
+            image_features=image_features,
+            input_ids=None,
+            allow_visual_only_mapping=True,
+        )
         
         return VLMOutput(
             caption="[Mock] A worker is performing a task in an industrial setting.",
             hazard_level="standard",
             confidence=0.95,
             tokens_used=tokens_used,
-            generation_time=0.1
+            generation_time=0.1,
+            decoding=decoding
         )

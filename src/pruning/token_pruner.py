@@ -23,10 +23,17 @@ class PruningResult:
     num_kept: int
     num_total: int
     reduction_ratio: float
+    evidence_indices: Optional[torch.Tensor] = None  # Detector-linked patch indices before safety fallback
     
     @property
     def num_pruned(self) -> int:
         return self.num_total - self.num_kept
+
+    @property
+    def num_evidence(self) -> int:
+        if self.evidence_indices is None:
+            return 0
+        return int(self.evidence_indices.numel())
 
 
 class TokenPruner(nn.Module):
@@ -186,8 +193,11 @@ class TokenPruner(nn.Module):
             cls_token = None
             patch_tokens = tokens
         
-        # Create mask from detections
-        mask = self.create_mask(detections, device)
+        # Create evidence mask from detections. Keep a copy so downstream
+        # diagnostics can distinguish detector-linked patches from fallback
+        # tokens that are retained only to satisfy the minimum-token guard.
+        evidence_mask = self.create_mask(detections, device)
+        mask = evidence_mask.clone()
         
         # Ensure minimum tokens
         if mask.sum() < self.min_tokens:
@@ -212,7 +222,8 @@ class TokenPruner(nn.Module):
                 kept_indices=kept_indices,
                 num_kept=len(kept_indices),
                 num_total=self.num_patches,
-                reduction_ratio=1.0 - len(kept_indices) / self.num_patches
+                reduction_ratio=1.0 - len(kept_indices) / self.num_patches,
+                evidence_indices=evidence_mask.nonzero(as_tuple=True)[0],
             )
             return pruned_tokens, result
         

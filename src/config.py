@@ -4,8 +4,9 @@ Uses Hydra/OmegaConf for hierarchical configuration.
 """
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List, Optional, Dict, Any
-from omegaconf import MISSING, OmegaConf
+from omegaconf import OmegaConf
 
 
 @dataclass
@@ -14,6 +15,12 @@ class HazardWeights:
     critical: float = 3.0  # fire, smoke, collapse
     high: float = 2.0      # forklift, machinery
     standard: float = 1.0  # person, vehicle
+
+
+@dataclass
+class GatingConfig:
+    """Configuration for temporal event-triggered gating."""
+    enabled: bool = True
 
 
 @dataclass
@@ -84,6 +91,29 @@ class VLMConfig:
 
 
 @dataclass
+class DecodingConfig:
+    """Configuration for evidence-aware sparse decoding."""
+    enabled: bool = False
+    budget: int = 128
+    min_keep: int = 64
+    sink_tokens: int = 4
+    recent_tokens: int = 32
+    preserve_evidence: bool = True
+    dense_fallback: bool = True
+    chunk_count: int = 8
+    dominant_chunks: List[int] = field(default_factory=lambda: [0, 1])
+
+
+@dataclass
+class ReportingConfig:
+    """Configuration for fail-closed evidence reporting."""
+    enabled: bool = True
+    min_evidence_links: int = 1
+    min_evidence_confidence: float = 0.0
+    max_latency_ms: Optional[float] = None
+
+
+@dataclass
 class DataConfig:
     """Configuration for datasets."""
     name: str = "ucf_crime"
@@ -145,9 +175,12 @@ class AutoTuneConfig:
 @dataclass
 class EventVLMConfig:
     """Main configuration for Event-VLM."""
+    gating: GatingConfig = field(default_factory=GatingConfig)
     detector: DetectorConfig = field(default_factory=DetectorConfig)
     pruning: PruningConfig = field(default_factory=PruningConfig)
     vlm: VLMConfig = field(default_factory=VLMConfig)
+    decoding: DecodingConfig = field(default_factory=DecodingConfig)
+    reporting: ReportingConfig = field(default_factory=ReportingConfig)
     data: DataConfig = field(default_factory=DataConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
     auto_tune: AutoTuneConfig = field(default_factory=AutoTuneConfig)
@@ -158,10 +191,59 @@ class EventVLMConfig:
 
 
 def load_config(config_path: str) -> EventVLMConfig:
-    """Load configuration from YAML file."""
+    """Load configuration from YAML file with lightweight defaults composition."""
+    config_file = Path(config_path)
+
+    def _resolve_default_path(entry: Any, parent: Path) -> Optional[Path]:
+        """Resolve a Hydra-style defaults entry into a YAML file path."""
+        if entry == "_self_":
+            return None
+
+        if isinstance(entry, str):
+            rel = entry
+        elif isinstance(entry, dict):
+            if len(entry) != 1:
+                raise ValueError(f"Unsupported defaults entry in {config_file}: {entry}")
+            group, value = next(iter(entry.items()))
+            if value in (None, "_self_"):
+                return None
+            rel = f"{group}/{value}"
+        else:
+            raise ValueError(f"Unsupported defaults entry type in {config_file}: {entry!r}")
+
+        if not rel.endswith(".yaml"):
+            rel = f"{rel}.yaml"
+        return parent / rel
+
+    def _compose(path: Path):
+        """Recursively compose config files listed under `defaults`."""
+        if not path.exists():
+            raise FileNotFoundError(f"Config file not found: {path}")
+
+        cfg = OmegaConf.load(path)
+        defaults = cfg.pop("defaults", [])
+        merged = OmegaConf.create()
+
+        for entry in defaults:
+            default_path = _resolve_default_path(entry, path.parent)
+            if default_path is None:
+                continue
+            merged = OmegaConf.merge(merged, _compose(default_path))
+
+        return OmegaConf.merge(merged, cfg)
+
+    # Compose file + defaults first, then keep only schema-compatible keys.
+    composed = _compose(config_file)
+    composed_dict = OmegaConf.to_container(composed, resolve=True)
+    allowed_keys = set(EventVLMConfig.__dataclass_fields__.keys())
+    filtered = {
+        key: value
+        for key, value in (composed_dict or {}).items()
+        if key in allowed_keys
+    }
+
     schema = OmegaConf.structured(EventVLMConfig)
-    file_conf = OmegaConf.load(config_path)
-    merged = OmegaConf.merge(schema, file_conf)
+    merged = OmegaConf.merge(schema, filtered)
     return OmegaConf.to_object(merged)
 
 

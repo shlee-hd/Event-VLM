@@ -15,9 +15,11 @@ import cv2
 from PIL import Image
 
 from src.config import EventVLMConfig, DetectorConfig, PruningConfig, VLMConfig
+from src.decoding import EvidenceAwareFCSparseSelector, FCSparseConfig
 from src.detector import DETRDetector, YOLODetector
 from src.detector.detr_wrapper import Detection, DetectionResult, get_detector
 from src.pruning import TokenPruner
+from src.reporting import ReportingContract, ReportingPolicy
 from src.vlm import LLaVAWrapper, HazardPriorityPrompting
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,11 @@ class FrameResult:
     tokens_used: int = 0
     tokens_total: int = 576
     processing_time: float = 0.0
+    vlm_processed: bool = False
+    report_status: str = "abstain"
+    report: Optional[Dict[str, Any]] = None
+    contract_failures: List[str] = field(default_factory=list)
+    decoding: Optional[Dict[str, Any]] = None
     
     @property
     def token_reduction(self) -> float:
@@ -76,16 +83,16 @@ class EventVLM:
     def __init__(
         self,
         config: Optional[EventVLMConfig] = None,
-        detector: str = "detr-l",
-        vlm: str = "llava-1.5-7b",
+        detector: Optional[str] = None,
+        vlm: Optional[str] = None,
         device: str = "cuda",
         verbose: bool = False
     ):
         """
         Args:
             config: Full configuration object
-            detector: Detector model name
-            vlm: VLM model name
+            detector: Optional detector model override
+            vlm: Optional VLM model override
             device: Target device
             verbose: Enable verbose logging
         """
@@ -104,6 +111,8 @@ class EventVLM:
         self.pruner = None
         self.vlm = None
         self.prompting = None
+        self.decoding_selector = None
+        self.reporting_contract = None
         
         self._initialized = False
     
@@ -149,6 +158,27 @@ class EventVLM:
         
         # Hazard-Priority Prompting
         self.prompting = HazardPriorityPrompting()
+
+        self.decoding_selector = EvidenceAwareFCSparseSelector(
+            FCSparseConfig(
+                enabled=self.config.decoding.enabled,
+                budget=self.config.decoding.budget,
+                min_keep=self.config.decoding.min_keep,
+                sink_tokens=self.config.decoding.sink_tokens,
+                recent_tokens=self.config.decoding.recent_tokens,
+                preserve_evidence=self.config.decoding.preserve_evidence,
+                dense_fallback=self.config.decoding.dense_fallback,
+                chunk_count=self.config.decoding.chunk_count,
+                dominant_chunks=tuple(self.config.decoding.dominant_chunks),
+            )
+        )
+        self.reporting_contract = ReportingContract(
+            ReportingPolicy(
+                min_evidence_links=self.config.reporting.min_evidence_links,
+                min_evidence_confidence=self.config.reporting.min_evidence_confidence,
+                max_latency_ms=self.config.reporting.max_latency_ms,
+            )
+        )
         
         self._initialized = True
         logger.info("Event-VLM pipeline initialized")
@@ -186,8 +216,8 @@ class EventVLM:
             hazard_level=detection_result.max_hazard_level
         )
         
-        # Skip VLM if no event detected (unless forced)
-        if not detection_result.is_event and not force_vlm:
+        # Skip VLM if no event detected (unless forced or temporal gating is disabled).
+        if self.config.gating.enabled and not detection_result.is_event and not force_vlm:
             result.processing_time = time.time() - start_time
             return result
         
@@ -207,7 +237,32 @@ class EventVLM:
             result.tokens_used = pruning_result.num_kept if pruning_result else result.tokens_total
         else:
             pruned_tokens = visual_tokens
+            pruning_result = None
             result.tokens_used = result.tokens_total
+
+        evidence_indices = []
+        selection_evidence_indices = []
+        if pruning_result is not None:
+            evidence_indices = self._tensor_to_int_list(pruning_result.evidence_indices)
+            selection_evidence_indices = self._selection_evidence_positions(
+                pruning_result=pruning_result,
+                pruned_tokens=pruned_tokens,
+            )
+        elif detection_result.detections:
+            evidence_mask = self.pruner.create_mask(
+                detection_result.detections,
+                visual_tokens.device,
+            )
+            evidence_indices = self._tensor_to_int_list(
+                evidence_mask.nonzero(as_tuple=True)[0]
+            )
+            selection_evidence_indices = list(evidence_indices)
+
+        sparse_selection = self.decoding_selector.select(
+            token_states=pruned_tokens,
+            evidence_indices=selection_evidence_indices
+        )
+        result.decoding = sparse_selection.to_dict()
         
         # Stage 3: Context-Aware Generation
         detected_classes = [d.class_name for d in detection_result.detections]
@@ -232,13 +287,72 @@ class EventVLM:
         vlm_output = self.vlm.generate(
             image=image_pil,
             prompt=prompt,
-            pruned_tokens=pruned_tokens
+            pruned_tokens=pruned_tokens,
+            sparse_selection=sparse_selection
         )
         
         result.caption = vlm_output.caption
+        result.vlm_processed = True
+        result.tokens_used = vlm_output.tokens_used or result.tokens_used
+        result.decoding = vlm_output.decoding or result.decoding
         result.processing_time = time.time() - start_time
+
+        if self.config.reporting.enabled:
+            report = self.reporting_contract.build_frame_report(
+                caption=result.caption,
+                frame_idx=frame_idx,
+                timestamp=timestamp,
+                detections=detection_result.detections,
+                latency_ms=result.processing_time * 1000.0,
+                token_indices=evidence_indices,
+                status="valid",
+                metadata={"hazard_level": result.hazard_level},
+            )
+            validation = self.reporting_contract.validate(report)
+            result.report_status = validation.resolved_status
+            result.contract_failures = list(validation.failures)
+            result.report = {
+                "event_statement": report.event_statement,
+                "status": validation.resolved_status,
+                "requested_status": validation.requested_status,
+                "evidence": [item.__dict__ for item in report.evidence],
+                "failures": result.contract_failures,
+                "latency_ms": report.latency_ms,
+                "metadata": report.metadata,
+            }
+        else:
+            result.report_status = "valid"
         
         return result
+
+    @staticmethod
+    def _tensor_to_int_list(tensor: Optional[torch.Tensor]) -> List[int]:
+        if tensor is None:
+            return []
+        return [int(i) for i in tensor.detach().cpu().tolist()]
+
+    @staticmethod
+    def _selection_evidence_positions(
+        *,
+        pruning_result: Any,
+        pruned_tokens: torch.Tensor,
+    ) -> List[int]:
+        evidence = set(EventVLM._tensor_to_int_list(pruning_result.evidence_indices))
+        if not evidence:
+            return []
+
+        kept = EventVLM._tensor_to_int_list(pruning_result.kept_indices)
+        offset = 0
+        if pruned_tokens.dim() >= 2:
+            token_count = int(pruned_tokens.shape[-2])
+            if token_count == len(kept) + 1:
+                offset = 1
+
+        return [
+            pos + offset
+            for pos, original_idx in enumerate(kept)
+            if original_idx in evidence
+        ]
     
     def process_video(
         self,
